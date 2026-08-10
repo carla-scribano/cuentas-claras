@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Herramientas gratuitas para entender tus deudas, calcular el costo real de comprar a cuotas y armar tu plan para salir de deudas. Hecho para Ecuador y Latinoamérica.">
+<title>Cuentas Claras — Sal de deudas, sin juzgarte</title>
+<style>
+  :root {
+    --verde: #0f766e;
+    --verde-oscuro: #115e59;
+    --verde-claro: #ccfbf1;
+    --crema: #fffbf5;
+    --texto: #1c1917;
+    --texto-suave: #57534e;
+    --rojo: #b91c1c;
+    --rojo-claro: #fee2e2;
+    --amarillo: #a16207;
+    --amarillo-claro: #fef9c3;
+    --verde-ok: #15803d;
+    --verde-ok-claro: #dcfce7;
+    --borde: #e7e5e4;
+    --sombra: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { font-size: 17px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--crema);
+    color: var(--texto);
+    line-height: 1.55;
+    padding-bottom: 90px; /* espacio para la barra de navegación */
+  }
+
+  /* ---------- Cabecera ---------- */
+  header {
+    background: var(--verde);
+    color: white;
+    padding: 1.1rem 1.2rem 1rem;
+    text-align: center;
+  }
+  header h1 { font-size: 1.35rem; letter-spacing: 0.2px; }
+  header p { font-size: 0.85rem; opacity: 0.9; margin-top: 2px; }
+
+  main { max-width: 640px; margin: 0 auto; padding: 1rem 1rem 2rem; }
+
+  .pantalla { display: none; }
+  .pantalla.activa { display: block; animation: aparecer 0.25s ease; }
+  @keyframes aparecer { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  h2 { font-size: 1.25rem; margin: 1.2rem 0 0.4rem; color: var(--verde-oscuro); }
+  h3 { font-size: 1.05rem; margin: 1rem 0 0.3rem; }
+  p.intro { color: var(--texto-suave); font-size: 0.95rem; }
+
+  /* ---------- Tarjetas ---------- */
+  .tarjeta {
+    background: white;
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+    padding: 1.1rem;
+    margin: 0.9rem 0;
+    box-shadow: var(--sombra);
+  }
+  .tarjeta-boton {
+    display: block;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+    background: white;
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+    padding: 1.1rem;
+    margin: 0.9rem 0;
+    box-shadow: var(--sombra);
+    transition: transform 0.1s ease;
+  }
+  .tarjeta-boton:active { transform: scale(0.98); }
+  .tarjeta-boton .emoji { font-size: 1.7rem; display: block; margin-bottom: 0.3rem; }
+  .tarjeta-boton strong { font-size: 1.05rem; color: var(--verde-oscuro); }
+  .tarjeta-boton span.desc { display: block; color: var(--texto-suave); font-size: 0.9rem; margin-top: 2px; }
+
+  /* ---------- Formularios ---------- */
+  label { display: block; font-weight: 600; font-size: 0.92rem; margin: 0.9rem 0 0.25rem; }
+  label small { font-weight: 400; color: var(--texto-suave); display: block; }
+  input[type="number"], input[type="text"], select {
+    width: 100%;
+    font-size: 1.15rem;
+    padding: 0.65rem 0.7rem;
+    border: 1.5px solid var(--borde);
+    border-radius: 10px;
+    background: white;
+    color: var(--texto);
+  }
+  input:focus, select:focus { outline: 2px solid var(--verde); border-color: var(--verde); }
+  .fila { display: flex; gap: 0.7rem; }
+  .fila > div { flex: 1; }
+
+  button.principal {
+    display: block;
+    width: 100%;
+    background: var(--verde);
+    color: white;
+    font: inherit;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    padding: 0.9rem;
+    margin-top: 1.2rem;
+    cursor: pointer;
+  }
+  button.principal:active { background: var(--verde-oscuro); }
+  button.secundario {
+    display: inline-block;
+    background: white;
+    color: var(--verde-oscuro);
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: 1.5px solid var(--verde);
+    border-radius: 10px;
+    padding: 0.5rem 0.9rem;
+    margin-top: 0.6rem;
+    cursor: pointer;
+  }
+
+  /* ---------- Resultados ---------- */
+  .resultado { display: none; }
+  .resultado.visible { display: block; }
+  .veredicto {
+    border-radius: 14px;
+    padding: 1.1rem;
+    margin: 1rem 0;
+    font-size: 1rem;
+  }
+  .veredicto .titulo { font-size: 1.15rem; font-weight: 800; display: block; margin-bottom: 0.3rem; }
+  .veredicto.rojo { background: var(--rojo-claro); color: var(--rojo); border: 1.5px solid #fca5a5; }
+  .veredicto.amarillo { background: var(--amarillo-claro); color: var(--amarillo); border: 1.5px solid #fde047; }
+  .veredicto.verde { background: var(--verde-ok-claro); color: var(--verde-ok); border: 1.5px solid #86efac; }
+
+  .dato-grande {
+    text-align: center;
+    padding: 0.8rem 0.5rem;
+  }
+  .dato-grande .numero { font-size: 2rem; font-weight: 800; color: var(--verde-oscuro); display: block; line-height: 1.15; }
+  .dato-grande .etiqueta { font-size: 0.85rem; color: var(--texto-suave); }
+  .datos-fila { display: flex; gap: 0.5rem; margin: 0.5rem 0; }
+  .datos-fila .dato-grande { flex: 1; background: #fafaf9; border-radius: 12px; }
+  .dato-grande.malo .numero { color: var(--rojo); }
+
+  /* Barra comparativa de precio contado vs total pagado */
+  .barra-comparacion { margin: 1rem 0; }
+  .barra-comparacion .linea { margin-bottom: 0.7rem; }
+  .barra-comparacion .nombre { font-size: 0.85rem; font-weight: 600; margin-bottom: 3px; }
+  .barra-comparacion .barra {
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding-left: 0.6rem;
+    color: white;
+    font-weight: 700;
+    font-size: 0.95rem;
+    min-width: fit-content;
+    white-space: nowrap;
+    padding-right: 0.6rem;
+  }
+  .barra.contado { background: var(--verde); }
+  .barra.total { background: var(--rojo); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 0.6rem 0; }
+  th, td { text-align: left; padding: 0.45rem 0.4rem; border-bottom: 1px solid var(--borde); }
+  th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.3px; color: var(--texto-suave); }
+  td.num, th.num { text-align: right; }
+
+  /* ---------- Lista de deudas ---------- */
+  .deuda-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fafaf9;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    padding: 0.6rem 0.8rem;
+    margin: 0.4rem 0;
+    gap: 0.5rem;
+  }
+  .deuda-item .info { flex: 1; }
+  .deuda-item .nombre { font-weight: 700; }
+  .deuda-item .detalle { font-size: 0.85rem; color: var(--texto-suave); }
+  .deuda-item button {
+    background: none; border: none; color: var(--rojo);
+    font-size: 1.3rem; cursor: pointer; padding: 0.3rem;
+  }
+  .orden-numero {
+    background: var(--verde);
+    color: white;
+    border-radius: 50%;
+    width: 28px; height: 28px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  /* ---------- Sección aprende ---------- */
+  details {
+    background: white;
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+    margin: 0.6rem 0;
+    box-shadow: var(--sombra);
+  }
+  details summary {
+    padding: 0.9rem 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  details summary::after { content: "+"; margin-left: auto; font-size: 1.3rem; color: var(--verde); }
+  details[open] summary::after { content: "−"; }
+  details .contenido { padding: 0 1rem 1rem; color: var(--texto); font-size: 0.95rem; }
+  details .contenido p { margin: 0.5rem 0; }
+  details .contenido ul { margin: 0.5rem 0 0.5rem 1.2rem; }
+  details .contenido li { margin: 0.3rem 0; }
+
+  .nota-apoyo {
+    background: var(--verde-claro);
+    border-radius: 14px;
+    padding: 1rem 1.1rem;
+    margin: 1.2rem 0;
+    font-size: 0.95rem;
+    color: var(--verde-oscuro);
+  }
+
+  .aviso-privacidad { font-size: 0.8rem; color: var(--texto-suave); text-align: center; margin-top: 1rem; }
+
+  /* ---------- Navegación inferior ---------- */
+  nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    border-top: 1px solid var(--borde);
+    display: flex;
+    justify-content: space-around;
+    padding: 0.4rem 0 max(0.4rem, env(safe-area-inset-bottom));
+    z-index: 10;
+  }
+  nav button {
+    background: none;
+    border: none;
+    font: inherit;
+    font-size: 0.7rem;
+    color: var(--texto-suave);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    padding: 0.3rem 0.6rem;
+    border-radius: 10px;
+    flex: 1;
+    max-width: 110px;
+  }
+  nav button .icono { font-size: 1.35rem; }
+  nav button.activo { color: var(--verde); font-weight: 700; background: var(--verde-claro); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>💡 Cuentas Claras</h1>
+  <p>Entiende tus deudas. Sal adelante. Sin juzgarte.</p>
+</header>
+
+<main>
+
+  <!-- ============ INICIO ============ -->
+  <section id="pantalla-inicio" class="pantalla activa">
+    <h2>¿Qué necesitas hoy?</h2>
+    <p class="intro">Herramientas gratis y fáciles para manejar tu plata. Todo queda en tu teléfono: no pedimos tu nombre, tu cédula ni tus datos.</p>
+
+    <button class="tarjeta-boton" onclick="irA('cuotas')">
+      <span class="emoji">🛒</span>
+      <strong>Voy a comprar a cuotas</strong>
+      <span class="desc">Celular, tele, moto, electrodoméstico… Descubre cuánto pagarás EN VERDAD antes de firmar.</span>
+    </button>
+
+    <button class="tarjeta-boton" onclick="irA('tarjeta')">
+      <span class="emoji">💳</span>
+      <strong>Tengo deuda en la tarjeta de crédito</strong>
+      <span class="desc">Mira por qué pagando "el mínimo" la deuda casi nunca baja, y cuánto te ahorras pagando un poco más.</span>
+    </button>
+
+    <button class="tarjeta-boton" onclick="irA('plan')">
+      <span class="emoji">🧗</span>
+      <strong>Quiero salir de mis deudas</strong>
+      <span class="desc">Arma tu plan paso a paso con el método bola de nieve. Miles de personas han salido así.</span>
+    </button>
+
+    <button class="tarjeta-boton" onclick="irA('aprende')">
+      <span class="emoji">📚</span>
+      <strong>Quiero entender mejor</strong>
+      <span class="desc">Deuda buena vs. deuda mala, cómo funcionan los intereses, señales de alerta y tus derechos.</span>
+    </button>
+
+    <div class="nota-apoyo">
+      <strong>Si tus deudas te tienen sin dormir:</strong> respira. Una deuda tiene salida, siempre. No eres mala persona por deber plata: es un problema de números, y los números se arreglan con un plan. Si sientes que ya no puedes más, habla con alguien de confianza o busca apoyo emocional gratuito (en Ecuador: línea 171 opción 6, o el 911 en una emergencia).
+    </div>
+  </section>
+
+  <!-- ============ CALCULADORA DE CUOTAS ============ -->
+  <section id="pantalla-cuotas" class="pantalla">
+    <h2>🛒 ¿Cuánto pagarás en verdad?</h2>
+    <p class="intro">Cuando te dicen "llévatelo por solo $12 a la semana", la cuota suena chiquita. Aquí vemos el precio completo, con todo e intereses, antes de que firmes.</p>
+
+    <div class="tarjeta">
+      <label for="c-precio">¿Cuánto cuesta pagando de contado?
+        <small>El precio normal, si lo pagaras todo de una. Pregúntalo en la tienda o búscalo en internet.</small>
+      </label>
+      <input type="number" id="c-precio" inputmode="decimal" placeholder="Ej: 250" min="0">
+
+      <label for="c-entrada">¿Cuánto das de entrada?
+        <small>Si no te piden entrada, deja 0.</small>
+      </label>
+      <input type="number" id="c-entrada" inputmode="decimal" placeholder="0" min="0">
+
+      <div class="fila">
+        <div>
+          <label for="c-cuota">¿De cuánto es cada cuota?</label>
+          <input type="number" id="c-cuota" inputmode="decimal" placeholder="Ej: 12">
+        </div>
+        <div>
+          <label for="c-numcuotas">¿Cuántas cuotas son?</label>
+          <input type="number" id="c-numcuotas" inputmode="numeric" placeholder="Ej: 52" min="1">
+        </div>
+      </div>
+
+      <label for="c-frecuencia">¿Cada cuánto pagas?</label>
+      <select id="c-frecuencia">
+        <option value="52">Cada semana</option>
+        <option value="26">Cada quincena</option>
+        <option value="12" selected>Cada mes</option>
+      </select>
+
+      <button class="principal" onclick="calcularCuotas()">Ver el costo real</button>
+    </div>
+
+    <div id="c-resultado" class="resultado"></div>
+  </section>
+
+  <!-- ============ TARJETA DE CRÉDITO ============ -->
+  <section id="pantalla-tarjeta" class="pantalla">
+    <h2>💳 La trampa del pago mínimo</h2>
+    <p class="intro">El "pago mínimo" está diseñado para que la deuda dure años. Pon tus números y mira cuánto tiempo (y cuánta plata) te tomaría salir.</p>
+
+    <div class="tarjeta">
+      <label for="t-saldo">¿Cuánto debes en la tarjeta?</label>
+      <input type="number" id="t-saldo" inputmode="decimal" placeholder="Ej: 1500" min="0">
+
+      <label for="t-tasa">Interés anual de tu tarjeta (%)
+        <small>Sale en tu estado de cuenta. En Ecuador suele estar cerca del 16%. Si no sabes, deja 16.</small>
+      </label>
+      <input type="number" id="t-tasa" inputmode="decimal" value="16" min="0" max="200">
+
+      <label for="t-pago">¿Cuánto pagas cada mes?
+        <small>Lo que de verdad abonas mensualmente.</small>
+      </label>
+      <input type="number" id="t-pago" inputmode="decimal" placeholder="Ej: 50" min="0">
+
+      <button class="principal" onclick="calcularTarjeta()">Ver cuándo salgo de esta deuda</button>
+    </div>
+
+    <div id="t-resultado" class="resultado"></div>
+  </section>
+
+  <!-- ============ PLAN BOLA DE NIEVE ============ -->
+  <section id="pantalla-plan" class="pantalla">
+    <h2>🧗 Tu plan para salir de deudas</h2>
+    <p class="intro">El método <strong>bola de nieve</strong>: pagas el mínimo de todas tus deudas, y todo lo extra lo mandas a la más pequeña. Cuando esa muere, su cuota se suma a la siguiente. Cada deuda pagada te da fuerza para la próxima.</p>
+
+    <div class="tarjeta">
+      <h3>1. Anota todas tus deudas</h3>
+      <label for="d-nombre">¿A quién le debes?</label>
+      <input type="text" id="d-nombre" placeholder="Ej: Tarjeta banco, celular, préstamo de mi tía">
+
+      <div class="fila">
+        <div>
+          <label for="d-saldo">¿Cuánto debes?</label>
+          <input type="number" id="d-saldo" inputmode="decimal" placeholder="Ej: 400" min="0">
+        </div>
+        <div>
+          <label for="d-cuota">Cuota mensual mínima</label>
+          <input type="number" id="d-cuota" inputmode="decimal" placeholder="Ej: 25" min="0">
+        </div>
+      </div>
+
+      <label for="d-tasa">Interés anual (%) <small>Si no sabes, deja 16. Si es sin interés (ej: le debes a un familiar), pon 0.</small></label>
+      <input type="number" id="d-tasa" inputmode="decimal" value="16" min="0" max="500">
+
+      <button class="secundario" onclick="agregarDeuda()">+ Agregar esta deuda</button>
+
+      <div id="d-lista"></div>
+    </div>
+
+    <div class="tarjeta">
+      <h3>2. ¿Cuánto extra puedes poner al mes?</h3>
+      <label for="d-extra">Aunque sean $5, todo suma
+        <small>Plata adicional a los pagos mínimos que ya haces.</small>
+      </label>
+      <input type="number" id="d-extra" inputmode="decimal" placeholder="Ej: 20" min="0">
+      <button class="principal" onclick="calcularPlan()">Armar mi plan</button>
+    </div>
+
+    <div id="d-resultado" class="resultado"></div>
+    <p class="aviso-privacidad">🔒 Tus deudas se guardan solo en este teléfono. Nadie más las ve.</p>
+  </section>
+
+  <!-- ============ APRENDE ============ -->
+  <section id="pantalla-aprende" class="pantalla">
+    <h2>📚 Entiende tu plata</h2>
+    <p class="intro">Explicaciones cortas, sin palabras raras. Toca cada tema para abrirlo.</p>
+
+    <details>
+      <summary>🟢🔴 ¿Deuda buena o deuda mala?</summary>
+      <div class="contenido">
+        <p><strong>Deuda buena:</strong> te ayuda a ganar más plata de la que te cuesta. Ejemplos: mercadería para tu negocio, una herramienta de trabajo que te genera ingresos, estudios que mejoran tu sueldo.</p>
+        <p><strong>Deuda mala:</strong> paga cosas que pierden valor o que se consumen. Ejemplos: ropa, fiestas, vacaciones, o un celular más caro del que necesitas, pagado a cuotas con intereses altos.</p>
+        <p>La prueba sencilla: <strong>¿esta deuda me va a meter plata al bolsillo, o solo me la saca?</strong> Si solo te la saca, piénsalo dos veces.</p>
+        <p>Ojo: hasta una "deuda buena" se vuelve mala si el interés es demasiado alto o si la cuota no te alcanza. Usa la calculadora 🛒 antes de decidir.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>🧲 ¿Por qué la cuota chiquita engaña?</summary>
+      <div class="contenido">
+        <p>"$12 a la semana" suena poco. Pero $12 × 52 semanas = <strong>$624 en un año</strong>. Si el producto costaba $250 de contado, pagaste más del doble.</p>
+        <p>Las tiendas y financieras lo saben: por eso te hablan de la cuota y casi nunca del total. No es casualidad, es estrategia de venta.</p>
+        <p>Regla de oro: <strong>antes de firmar, multiplica la cuota por el número de cuotas y súmale la entrada.</strong> Ese es el precio real. Compáralo con el precio de contado y decide con los ojos abiertos.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>💳 Cómo funciona de verdad una tarjeta de crédito</summary>
+      <div class="contenido">
+        <p>La tarjeta no es plata tuya: es un préstamo instantáneo cada vez que la pasas.</p>
+        <ul>
+          <li><strong>Si pagas TODO el total cada mes</strong> antes de la fecha de pago, no pagas intereses. Así usada, la tarjeta es una herramienta útil.</li>
+          <li><strong>Si pagas solo el mínimo</strong>, el resto de tu deuda sigue creciendo con interés cada mes. El mínimo está calculado para que la deuda dure años.</li>
+          <li><strong>Diferir a meses "sin intereses"</strong> a veces tiene cargos escondidos: cuotas de manejo, seguros, comisiones. Pregunta siempre por el "costo total" antes de aceptar.</li>
+          <li><strong>Avances de efectivo</strong> (sacar plata en cajero con la tarjeta): casi siempre es la opción más cara de todas. Evítalos.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>📱 Celulares "a cuotitas": lo que debes saber</summary>
+      <div class="contenido">
+        <p>Hay empresas que venden celulares a crédito con cuotas semanales, y si te atrasas, <strong>el celular se bloquea</strong> hasta que pagues. Es decir: el teléfono es la garantía del préstamo.</p>
+        <p>Antes de aceptar, averigua y anota:</p>
+        <ul>
+          <li>¿Cuánto cuesta ese mismo celular <strong>de contado</strong> en otra tienda?</li>
+          <li>¿Cuánto suman <strong>todas</strong> las cuotas más la entrada?</li>
+          <li>¿Qué pasa exactamente si te atrasas una semana? ¿Cobran recargos?</li>
+        </ul>
+        <p>Muchas veces el total termina siendo 2 o 3 veces el precio del equipo. A veces conviene comprar uno más sencillo de contado, o ahorrar unas semanas, antes que pagar el triple. Usa la calculadora 🛒 con tus números y decide tú.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>🦈 El chulco: por qué es la peor salida</summary>
+      <div class="contenido">
+        <p>El "chulquero" o prestamista informal presta rápido y sin papeles, pero con intereses brutales (a veces 10% o 20% ¡al mes!) y cobra con amenazas. Mucha gente entra por una urgencia y queda atrapada años.</p>
+        <p>Si estás pensando en el chulco, primero agota estas opciones:</p>
+        <ul>
+          <li>Pide a tu banco o cooperativa una <strong>refinanciación</strong> de tus deudas (es tu derecho pedirla).</li>
+          <li>Habla con familiares antes que con extraños, aunque dé vergüenza.</li>
+          <li>Vende algo que no uses.</li>
+          <li>Las cooperativas de ahorro suelen prestar a personas sin historial bancario; pregunta en una cercana.</li>
+        </ul>
+        <p>Y si ya estás con un chulquero y te amenazan: la extorsión es un delito. Puedes denunciar al 1800‑DELITO o en la Fiscalía.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>🚨 Señales de que las deudas se te están saliendo de las manos</summary>
+      <div class="contenido">
+        <ul>
+          <li>Pagas una deuda sacando otra deuda.</li>
+          <li>Solo alcanzas a pagar los mínimos de la tarjeta.</li>
+          <li>Más de la mitad de lo que ganas al mes se va en cuotas.</li>
+          <li>Escondes deudas a tu pareja o familia.</li>
+          <li>Piensas en el chulco para "tapar huecos".</li>
+        </ul>
+        <p>Si marcaste 2 o más: no esperes. Arma tu plan hoy en la sección 🧗. Entre más pronto empieces, más fácil es. Y recuerda: <strong>deber plata no te hace mala persona</strong>. Es un problema de números, y tiene solución.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>🛡️ Tus derechos como deudor (Ecuador)</summary>
+      <div class="contenido">
+        <ul>
+          <li>Las tasas de interés tienen <strong>límites legales</strong> fijados por el Banco Central. Cobrar más es usura, y es un delito.</li>
+          <li>Tienes derecho a pedir una <strong>tabla de amortización</strong>: el detalle de cada cuota, cuánto va a capital y cuánto a interés. Pídela siempre, por escrito.</li>
+          <li>Puedes pedir <strong>refinanciar o reestructurar</strong> tu deuda si estás en problemas. Habla con el banco ANTES de caer en mora: tendrás mejores condiciones.</li>
+          <li>Nadie puede cobrarte con amenazas, humillaciones o llamadas a tu trabajo o familiares. Eso se puede denunciar ante la Superintendencia de Bancos o la Defensoría del Pueblo.</li>
+          <li>Pagar por adelantado (precancelar) es tu derecho y debe <strong>reducir los intereses</strong> que pagas.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>💰 3 pasos para ordenar tu plata (aunque ganes poco)</summary>
+      <div class="contenido">
+        <p><strong>1. Anota todo lo que gastas por una semana.</strong> En papel o en el celular, da igual. La mayoría se sorprende de a dónde se va la plata (delivery, recargas, "cositas").</p>
+        <p><strong>2. Separa primero, gasta después.</strong> El día que te llega la plata, aparta ALGO (aunque sean $5) antes de gastar. Si esperas a ver "qué sobra", nunca sobra nada.</p>
+        <p><strong>3. Arma un colchón de emergencia.</strong> Meta inicial: $50. Luego $100. Esa platita es la que evita que una emergencia (medicina, un daño en la casa) te mande al chulco o a la tarjeta.</p>
+      </div>
+    </details>
+
+    <div class="nota-apoyo">
+      💚 Este proyecto es gratuito y sin fines de lucro. No vendemos créditos, no pedimos tus datos y no ganamos nada con tus decisiones. Solo queremos que decidas con información.
+    </div>
+  </section>
+
+</main>
+
+<nav>
+  <button id="nav-inicio" class="activo" onclick="irA('inicio')"><span class="icono">🏠</span>Inicio</button>
+  <button id="nav-cuotas" onclick="irA('cuotas')"><span class="icono">🛒</span>Cuotas</button>
+  <button id="nav-tarjeta" onclick="irA('tarjeta')"><span class="icono">💳</span>Tarjeta</button>
+  <button id="nav-plan" onclick="irA('plan')"><span class="icono">🧗</span>Mi plan</button>
+  <button id="nav-aprende" onclick="irA('aprende')"><span class="icono">📚</span>Aprende</button>
+</nav>
+
+<script>
+/* ================= Navegación ================= */
+function irA(nombre) {
+  document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
+  document.getElementById('pantalla-' + nombre).classList.add('activa');
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('activo'));
+  document.getElementById('nav-' + nombre).classList.add('activo');
+  window.scrollTo({ top: 0 });
+}
+
+function dinero(n) {
+  return '$' + n.toLocaleString('es-EC', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function textoTiempo(meses) {
+  const anios = Math.floor(meses / 12);
+  const resto = meses % 12;
+  if (anios === 0) return meses + (meses === 1 ? ' mes' : ' meses');
+  let texto = anios + (anios === 1 ? ' año' : ' años');
+  if (resto > 0) texto += ' y ' + resto + (resto === 1 ? ' mes' : ' meses');
+  return texto;
+}
+
+/* ================= Calculadora de cuotas ================= */
+
+/*
+ * Calcula la tasa de interés periódica implícita de un crédito en cuotas iguales,
+ * resolviendo por bisección:  montoFinanciado = cuota * (1 - (1+r)^-n) / r
+ */
+function tasaImplicita(montoFinanciado, cuota, n) {
+  if (cuota * n <= montoFinanciado) return 0;
+  let bajo = 1e-9, alto = 10; // 0% a 1000% por período
+  for (let i = 0; i < 200; i++) {
+    const r = (bajo + alto) / 2;
+    const valorPresente = cuota * (1 - Math.pow(1 + r, -n)) / r;
+    if (valorPresente > montoFinanciado) bajo = r; else alto = r;
+  }
+  return (bajo + alto) / 2;
+}
+
+function calcularCuotas() {
+  const precio = parseFloat(document.getElementById('c-precio').value);
+  const entrada = parseFloat(document.getElementById('c-entrada').value) || 0;
+  const cuota = parseFloat(document.getElementById('c-cuota').value);
+  const numCuotas = parseInt(document.getElementById('c-numcuotas').value);
+  const periodosPorAnio = parseInt(document.getElementById('c-frecuencia').value);
+  const caja = document.getElementById('c-resultado');
+
+  if (!precio || !cuota || !numCuotas || precio <= 0 || cuota <= 0 || numCuotas <= 0) {
+    caja.innerHTML = '<div class="veredicto amarillo"><span class="titulo">Faltan datos</span>Necesito el precio de contado, el valor de la cuota y cuántas cuotas son.</div>';
+    caja.classList.add('visible');
+    return;
+  }
+  if (entrada >= precio) {
+    caja.innerHTML = '<div class="veredicto amarillo"><span class="titulo">Revisa la entrada</span>La entrada no puede ser igual o mayor que el precio del producto.</div>';
+    caja.classList.add('visible');
+    return;
+  }
+
+  const totalPagado = entrada + cuota * numCuotas;
+  const sobreprecio = totalPagado - precio;
+  const veces = totalPagado / precio;
+  const montoFinanciado = precio - entrada;
+  const rPeriodo = tasaImplicita(montoFinanciado, cuota, numCuotas);
+  const tasaAnual = (Math.pow(1 + rPeriodo, periodosPorAnio) - 1) * 100;
+
+  const nombreFrecuencia = { 52: 'semanas', 26: 'quincenas', 12: 'meses' }[periodosPorAnio];
+  const duracionAnios = numCuotas / periodosPorAnio;
+  const duracionTexto = duracionAnios >= 1
+    ? duracionAnios.toFixed(1).replace('.0', '') + (duracionAnios >= 2 ? ' años' : ' año')
+    : numCuotas + ' ' + nombreFrecuencia;
+
+  // Veredicto según cuánto más caro sale y la tasa anual implícita
+  let claseVeredicto, tituloVeredicto, textoVeredicto;
+  if (sobreprecio <= 0.005 * precio) {
+    claseVeredicto = 'verde';
+    tituloVeredicto = '✅ Sin recargo (o casi)';
+    textoVeredicto = 'Pagarías prácticamente lo mismo que de contado. Si la cuota te alcanza cómodamente, es un trato razonable. Igual confirma que no haya cargos extra: seguros, comisiones o cuotas de "manejo".';
+  } else if (tasaAnual <= 20) {
+    claseVeredicto = 'verde';
+    tituloVeredicto = '🟢 Recargo moderado';
+    textoVeredicto = 'El interés es parecido al de un crédito bancario normal. No es gratis: igual pagas ' + dinero(sobreprecio) + ' extra. Vale la pena si es algo que realmente necesitas y la cuota no te aprieta.';
+  } else if (tasaAnual <= 50) {
+    claseVeredicto = 'amarillo';
+    tituloVeredicto = '🟡 Cuidado: esto es caro';
+    textoVeredicto = 'Este crédito te cobra un interés bastante más alto que un banco. Pregunta en una cooperativa o banco si te pueden financiar más barato, o considera ahorrar unas semanas y comprar de contado algo más sencillo.';
+  } else {
+    claseVeredicto = 'rojo';
+    tituloVeredicto = '🔴 ¡Alerta! Es carísimo';
+    textoVeredicto = 'Estarías pagando un interés altísimo. Con este trato, de cada dólar que pagas, gran parte es puro interés. Piénsalo dos veces: ¿de verdad lo necesitas YA, o puedes ahorrar unas semanas y comprar de contado?';
+  }
+
+  const anchoContado = Math.max(30, Math.round(precio / totalPagado * 100));
+
+  caja.innerHTML = `
+    <div class="veredicto ${claseVeredicto}">
+      <span class="titulo">${tituloVeredicto}</span>
+      ${textoVeredicto}
+    </div>
+
+    <div class="tarjeta">
+      <div class="barra-comparacion">
+        <div class="linea">
+          <div class="nombre">Precio de contado</div>
+          <div class="barra contado" style="width:${anchoContado}%">${dinero(precio)}</div>
+        </div>
+        <div class="linea">
+          <div class="nombre">Lo que pagarías en total (entrada + todas las cuotas)</div>
+          <div class="barra total" style="width:100%">${dinero(totalPagado)}</div>
+        </div>
+      </div>
+
+      <div class="datos-fila">
+        <div class="dato-grande malo">
+          <span class="numero">${dinero(sobreprecio)}</span>
+          <span class="etiqueta">pagas de más</span>
+        </div>
+        <div class="dato-grande malo">
+          <span class="numero">${veces.toFixed(1)}×</span>
+          <span class="etiqueta">veces el precio</span>
+        </div>
+      </div>
+      <div class="datos-fila">
+        <div class="dato-grande">
+          <span class="numero">${tasaAnual >= 1 ? Math.round(tasaAnual) + '%' : '0%'}</span>
+          <span class="etiqueta">interés anual aproximado*</span>
+        </div>
+        <div class="dato-grande">
+          <span class="numero">${duracionTexto}</span>
+          <span class="etiqueta">pagando esta deuda</span>
+        </div>
+      </div>
+      <p style="font-size:0.8rem; color:var(--texto-suave)">*Calculado con tus números. Para comparar: un crédito de consumo en un banco ecuatoriano cobra alrededor de 16% anual.</p>
+    </div>
+
+    <div class="tarjeta">
+      <h3>💡 Antes de decidir, pregúntate:</h3>
+      <ul style="margin-left:1.2rem; font-size:0.95rem">
+        <li style="margin:0.4rem 0">¿Esto me ayuda a <strong>ganar plata</strong> (trabajo, negocio) o solo es un gusto?</li>
+        <li style="margin:0.4rem 0">Si ahorro ${dinero(cuota)} por ${nombreFrecuencia.replace('es','e')} en vez de pagarlos, ¿en cuánto tiempo lo compro de contado? (Respuesta: en ${Math.ceil(montoFinanciado / cuota)} ${nombreFrecuencia}, y me ahorro ${dinero(sobreprecio)}.)</li>
+        <li style="margin:0.4rem 0">¿Qué pasa si un mes no puedo pagar? ¿Hay recargos? ¿Me bloquean o me quitan el producto?</li>
+      </ul>
+    </div>
+  `;
+  caja.classList.add('visible');
+  caja.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ================= Tarjeta de crédito ================= */
+function calcularTarjeta() {
+  const saldo = parseFloat(document.getElementById('t-saldo').value);
+  const tasaAnual = parseFloat(document.getElementById('t-tasa').value);
+  const pago = parseFloat(document.getElementById('t-pago').value);
+  const caja = document.getElementById('t-resultado');
+
+  if (!saldo || !pago || saldo <= 0 || pago <= 0 || isNaN(tasaAnual) || tasaAnual < 0) {
+    caja.innerHTML = '<div class="veredicto amarillo"><span class="titulo">Faltan datos</span>Necesito cuánto debes, el interés anual y cuánto pagas al mes.</div>';
+    caja.classList.add('visible');
+    return;
+  }
+
+  const i = Math.pow(1 + tasaAnual / 100, 1 / 12) - 1; // tasa mensual equivalente
+  const interesPrimerMes = saldo * i;
+
+  if (pago <= interesPrimerMes) {
+    caja.innerHTML = `
+      <div class="veredicto rojo">
+        <span class="titulo">🔴 Con ese pago, la deuda NUNCA baja</span>
+        Solo los intereses de este mes son ${dinero(interesPrimerMes)}. Como pagas ${dinero(pago)}, tu deuda crece en vez de bajar. Necesitas pagar más que ${dinero(interesPrimerMes)} al mes, aunque sea un poquito más, para empezar a salir. Si no te alcanza, llama YA a tu banco y pide refinanciar: es tu derecho.
+      </div>`;
+    caja.classList.add('visible');
+    caja.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+
+  // Simula mes a mes el pago fijo
+  function simular(pagoMensual) {
+    let deuda = saldo, meses = 0, totalIntereses = 0;
+    while (deuda > 0 && meses < 1200) {
+      const interes = deuda * i;
+      totalIntereses += interes;
+      deuda = deuda + interes - pagoMensual;
+      meses++;
+    }
+    return { meses, totalIntereses, totalPagado: saldo + totalIntereses };
+  }
+
+  const actual = simular(pago);
+  const conExtra = simular(pago + 20);
+
+  const tiempoTexto = textoTiempo(actual.meses);
+
+  const ahorroTiempo = actual.meses - conExtra.meses;
+  const ahorroPlata = actual.totalIntereses - conExtra.totalIntereses;
+
+  const clase = actual.meses > 36 ? 'rojo' : actual.meses > 12 ? 'amarillo' : 'verde';
+
+  caja.innerHTML = `
+    <div class="veredicto ${clase}">
+      <span class="titulo">Pagando ${dinero(pago)} al mes, saldrías en ${tiempoTexto}</span>
+      Y habrás pagado ${dinero(actual.totalIntereses)} solo en intereses.
+    </div>
+
+    <div class="tarjeta">
+      <div class="datos-fila">
+        <div class="dato-grande">
+          <span class="numero">${actual.meses}</span>
+          <span class="etiqueta">meses para salir</span>
+        </div>
+        <div class="dato-grande malo">
+          <span class="numero">${dinero(actual.totalIntereses)}</span>
+          <span class="etiqueta">intereses totales</span>
+        </div>
+      </div>
+      <div class="dato-grande">
+        <span class="numero">${dinero(actual.totalPagado)}</span>
+        <span class="etiqueta">pagarás en total por tu deuda de ${dinero(saldo)}</span>
+      </div>
+    </div>
+
+    <div class="tarjeta" style="border-color:#86efac; background:#f0fdf4">
+      <h3>💪 ¿Y si pagaras solo $20 más al mes?</h3>
+      <p style="font-size:0.95rem">Pagando ${dinero(pago + 20)} en vez de ${dinero(pago)}:</p>
+      <div class="datos-fila">
+        <div class="dato-grande">
+          <span class="numero" style="color:var(--verde-ok)">${ahorroTiempo} meses</span>
+          <span class="etiqueta">antes te liberas</span>
+        </div>
+        <div class="dato-grande">
+          <span class="numero" style="color:var(--verde-ok)">${dinero(ahorroPlata)}</span>
+          <span class="etiqueta">te ahorras en intereses</span>
+        </div>
+      </div>
+      <p style="font-size:0.9rem; color:var(--texto-suave)">Cada dólar extra que pagas va directo a bajar tu deuda. Por eso hasta $5 más hacen diferencia.</p>
+    </div>
+
+    <div class="tarjeta">
+      <h3>📌 Mientras tanto:</h3>
+      <ul style="margin-left:1.2rem; font-size:0.95rem">
+        <li style="margin:0.4rem 0"><strong>Guarda la tarjeta</strong> (déjala en casa) hasta salir de esta deuda. No se puede vaciar una piscina con la llave abierta.</li>
+        <li style="margin:0.4rem 0">Nunca hagas <strong>avances de efectivo</strong>: son la deuda más cara.</li>
+        <li style="margin:0.4rem 0">Si la cuota no te alcanza, pide a tu banco <strong>refinanciar</strong> antes de atrasarte. Atrasado te cobran mora y dañas tu historial.</li>
+      </ul>
+    </div>
+  `;
+  caja.classList.add('visible');
+  caja.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ================= Plan bola de nieve ================= */
+let deudas = [];
+
+function cargarDeudas() {
+  try {
+    const guardadas = localStorage.getItem('cuentasClarasDeudas');
+    if (guardadas) deudas = JSON.parse(guardadas);
+  } catch (e) { deudas = []; }
+  pintarDeudas();
+}
+
+function guardarDeudas() {
+  try { localStorage.setItem('cuentasClarasDeudas', JSON.stringify(deudas)); } catch (e) {}
+}
+
+function agregarDeuda() {
+  const nombre = document.getElementById('d-nombre').value.trim();
+  const saldo = parseFloat(document.getElementById('d-saldo').value);
+  const cuota = parseFloat(document.getElementById('d-cuota').value);
+  const tasa = parseFloat(document.getElementById('d-tasa').value) || 0;
+
+  if (!nombre || !saldo || saldo <= 0 || !cuota || cuota <= 0) {
+    alert('Necesito el nombre, cuánto debes y la cuota mensual.');
+    return;
+  }
+  deudas.push({ nombre, saldo, cuota, tasa });
+  guardarDeudas();
+  pintarDeudas();
+  document.getElementById('d-nombre').value = '';
+  document.getElementById('d-saldo').value = '';
+  document.getElementById('d-cuota').value = '';
+  document.getElementById('d-tasa').value = '16';
+}
+
+function borrarDeuda(indice) {
+  deudas.splice(indice, 1);
+  guardarDeudas();
+  pintarDeudas();
+  document.getElementById('d-resultado').classList.remove('visible');
+}
+
+function pintarDeudas() {
+  const lista = document.getElementById('d-lista');
+  if (deudas.length === 0) {
+    lista.innerHTML = '<p style="color:var(--texto-suave); font-size:0.9rem; margin-top:0.8rem">Aún no has anotado deudas.</p>';
+    return;
+  }
+  lista.innerHTML = deudas.map((d, idx) => `
+    <div class="deuda-item">
+      <div class="info">
+        <div class="nombre">${escaparHtml(d.nombre)}</div>
+        <div class="detalle">Debes ${dinero(d.saldo)} · cuota ${dinero(d.cuota)}/mes · ${d.tasa}% anual</div>
+      </div>
+      <button onclick="borrarDeuda(${idx})" aria-label="Borrar deuda">✕</button>
+    </div>
+  `).join('');
+}
+
+function escaparHtml(texto) {
+  const div = document.createElement('div');
+  div.textContent = texto;
+  return div.innerHTML;
+}
+
+function calcularPlan() {
+  const caja = document.getElementById('d-resultado');
+  const extra = parseFloat(document.getElementById('d-extra').value) || 0;
+
+  if (deudas.length === 0) {
+    caja.innerHTML = '<div class="veredicto amarillo"><span class="titulo">Primero anota tus deudas</span>Agrega al menos una deuda arriba para armar tu plan.</div>';
+    caja.classList.add('visible');
+    return;
+  }
+
+  // Bola de nieve: ordenar de menor a mayor saldo
+  const orden = deudas.map((d, idx) => ({ ...d, idx })).sort((a, b) => a.saldo - b.saldo);
+
+  // Simulación mes a mes: mínimos en todas + (extra + cuotas liberadas) a la más pequeña viva
+  const sim = orden.map(d => ({ ...d, restante: d.saldo, mesLiquidada: null, interesPagado: 0 }));
+  let mes = 0;
+  const maxMeses = 1200;
+  let imposible = false;
+
+  while (sim.some(d => d.restante > 0) && mes < maxMeses) {
+    mes++;
+    let bolsaExtra = extra;
+    // Cuotas de deudas ya pagadas se suman a la bolsa (el efecto bola de nieve)
+    sim.forEach(d => { if (d.restante <= 0) bolsaExtra += d.cuota; });
+
+    let avanzo = false;
+    for (const d of sim) {
+      if (d.restante <= 0) continue;
+      const interes = d.restante * (Math.pow(1 + d.tasa / 100, 1 / 12) - 1);
+      d.interesPagado += interes;
+      let pago = d.cuota;
+      d.restante = d.restante + interes - pago;
+      if (d.restante < d.saldo) avanzo = true;
+      if (d.restante <= 0) { d.mesLiquidada = mes; d.restante = 0; }
+    }
+    // El extra va a la deuda viva más pequeña (la primera en el orden)
+    const objetivo = sim.find(d => d.restante > 0);
+    if (objetivo && bolsaExtra > 0) {
+      objetivo.restante -= bolsaExtra;
+      avanzo = true;
+      if (objetivo.restante <= 0) { objetivo.mesLiquidada = mes; objetivo.restante = 0; }
+    }
+    if (!avanzo && mes > 2) { imposible = true; break; }
+  }
+
+  const totalDeuda = deudas.reduce((s, d) => s + d.saldo, 0);
+  const totalCuotas = deudas.reduce((s, d) => s + d.cuota, 0);
+
+  if (imposible || mes >= maxMeses) {
+    caja.innerHTML = `
+      <div class="veredicto rojo">
+        <span class="titulo">🔴 Con estos pagos, las deudas no bajan</span>
+        Los intereses crecen más rápido que tus pagos. No es tu culpa: así están diseñadas algunas deudas. Qué hacer: (1) llama a tus bancos y pide <strong>refinanciar</strong> — cuotas más bajas o mejor tasa; (2) prioriza la deuda con el interés más alto; (3) busca aunque sea $10 extra al mes. Si necesitas ayuda, la Defensoría del Pueblo orienta gratis en temas de deudas.
+      </div>`;
+    caja.classList.add('visible');
+    return;
+  }
+
+  const tiempoTexto = textoTiempo(mes);
+
+  const fechaLibre = new Date();
+  fechaLibre.setMonth(fechaLibre.getMonth() + mes);
+  const nombreMeses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const fechaTexto = nombreMeses[fechaLibre.getMonth()] + ' de ' + fechaLibre.getFullYear();
+
+  caja.innerHTML = `
+    <div class="veredicto verde">
+      <span class="titulo">🎉 ¡Tienes plan! Serías libre de deudas en ${tiempoTexto}</span>
+      Pagando tus cuotas (${dinero(totalCuotas)}/mes) más ${dinero(extra)} extra, terminarías cerca de <strong>${fechaTexto}</strong>.
+    </div>
+
+    <div class="tarjeta">
+      <h3>Tu orden de ataque</h3>
+      <p style="font-size:0.9rem; color:var(--texto-suave)">Paga el mínimo de todas, y TODO lo extra a la #1. Cuando la #1 muera, su cuota pasa a la #2, y así la bola crece.</p>
+      ${sim.map((d, posicion) => `
+        <div class="deuda-item">
+          <span class="orden-numero">${posicion + 1}</span>
+          <div class="info">
+            <div class="nombre">${escaparHtml(d.nombre)}</div>
+            <div class="detalle">${dinero(d.saldo)} · la liquidas en el mes ${d.mesLiquidada}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="tarjeta">
+      <div class="datos-fila">
+        <div class="dato-grande">
+          <span class="numero">${dinero(totalDeuda)}</span>
+          <span class="etiqueta">deuda total hoy</span>
+        </div>
+        <div class="dato-grande">
+          <span class="numero">${mes}</span>
+          <span class="etiqueta">meses de plan</span>
+        </div>
+      </div>
+      <p style="font-size:0.9rem; color:var(--texto-suave); margin-top:0.5rem">💪 Consejo: celebra cada deuda que liquides. No es solo plata: es paz. Y si un mes no puedes con el extra, no abandones el plan; paga los mínimos y retoma el siguiente mes.</p>
+    </div>
+  `;
+  caja.classList.add('visible');
+  caja.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+cargarDeudas();
+</script>
+</body>
+</html>
