@@ -265,8 +265,101 @@
     flex: 1;
     max-width: 110px;
   }
-  nav button .icono { font-size: 1.35rem; }
+  nav button .icono { font-size: 1.3rem; }
   nav button.activo { color: var(--verde); font-weight: 700; background: var(--verde-claro); }
+
+  /* ---------- Chat ---------- */
+  .selector-persona { display: flex; gap: 0.6rem; margin: 0.8rem 0; }
+  .selector-persona button {
+    flex: 1;
+    font: inherit;
+    background: white;
+    border: 2px solid var(--borde);
+    border-radius: 14px;
+    padding: 0.7rem 0.4rem;
+    cursor: pointer;
+    text-align: center;
+  }
+  .selector-persona button .avatar { font-size: 1.8rem; display: block; }
+  .selector-persona button strong { font-size: 0.95rem; color: var(--verde-oscuro); display: block; }
+  .selector-persona button span.rol { font-size: 0.75rem; color: var(--texto-suave); }
+  .selector-persona button.activo { border-color: var(--verde); background: var(--verde-claro); }
+
+  .chat-caja {
+    background: white;
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+    box-shadow: var(--sombra);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .chat-mensajes {
+    padding: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    min-height: 180px;
+    max-height: 55vh;
+    overflow-y: auto;
+  }
+  .burbuja {
+    max-width: 88%;
+    padding: 0.6rem 0.8rem;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  .burbuja.bot { background: #f5f5f4; border-bottom-left-radius: 4px; align-self: flex-start; }
+  .burbuja.usuario { background: var(--verde); color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
+  .burbuja.escribiendo { color: var(--texto-suave); font-style: italic; }
+  .burbuja .quien { display: block; font-size: 0.72rem; font-weight: 700; color: var(--verde-oscuro); margin-bottom: 2px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0 0.9rem 0.7rem; }
+  .chips button {
+    font: inherit;
+    font-size: 0.8rem;
+    background: var(--verde-claro);
+    color: var(--verde-oscuro);
+    border: none;
+    border-radius: 99px;
+    padding: 0.4rem 0.75rem;
+    cursor: pointer;
+  }
+  .chat-entrada {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.6rem;
+    border-top: 1px solid var(--borde);
+  }
+  .chat-entrada input {
+    flex: 1;
+    font: inherit;
+    font-size: 1rem;
+    border: 1.5px solid var(--borde);
+    border-radius: 99px;
+    padding: 0.55rem 0.9rem;
+  }
+  .chat-entrada button {
+    font: inherit;
+    background: var(--verde);
+    color: white;
+    border: none;
+    border-radius: 99px;
+    width: 44px; height: 44px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .chat-entrada button:disabled { opacity: 0.5; }
+  .aviso-chat {
+    font-size: 0.72rem;
+    color: var(--texto-suave);
+    text-align: center;
+    padding: 0 0.8rem 0.6rem;
+  }
 </style>
 </head>
 <body>
@@ -305,6 +398,12 @@
       <span class="emoji">📚</span>
       <strong>Quiero entender mejor</strong>
       <span class="desc">Deuda buena vs. deuda mala, cómo funcionan los intereses, señales de alerta y tus derechos.</span>
+    </button>
+
+    <button class="tarjeta-boton" onclick="irA('chat')">
+      <span class="emoji">💬</span>
+      <strong>Tengo una pregunta</strong>
+      <span class="desc">Pregúntale a Clarita (finanzas) o al Doctor Justo (temas legales). Gratis y sin registrarte.</span>
     </button>
 
     <div class="nota-apoyo">
@@ -417,6 +516,36 @@
 
     <div id="d-resultado" class="resultado"></div>
     <p class="aviso-privacidad">🔒 Tus deudas se guardan solo en este teléfono. Nadie más las ve.</p>
+  </section>
+
+  <!-- ============ CHAT ============ -->
+  <section id="pantalla-chat" class="pantalla">
+    <h2>💬 Pregunta con confianza</h2>
+    <p class="intro">Elige con quién quieres hablar. Toca una pregunta frecuente o escribe la tuya. No pedimos tu nombre ni guardamos tus conversaciones.</p>
+
+    <div class="selector-persona">
+      <button id="persona-financiero" class="activo" onclick="cambiarPersona('financiero')">
+        <span class="avatar">👩🏽‍💼</span>
+        <strong>Clarita</strong>
+        <span class="rol">Asesora de finanzas</span>
+      </button>
+      <button id="persona-legal" onclick="cambiarPersona('legal')">
+        <span class="avatar">👨🏽‍⚖️</span>
+        <strong>Doctor Justo</strong>
+        <span class="rol">Orientador legal</span>
+      </button>
+    </div>
+
+    <div class="chat-caja">
+      <div id="chat-mensajes" class="chat-mensajes"></div>
+      <div id="chat-chips" class="chips"></div>
+      <div class="chat-entrada">
+        <input type="text" id="chat-input" maxlength="500" placeholder="Escribe tu pregunta…"
+               onkeydown="if(event.key==='Enter') enviarMensaje()">
+        <button id="chat-enviar" onclick="enviarMensaje()" aria-label="Enviar">➤</button>
+      </div>
+      <p class="aviso-chat">Respuestas educativas generadas con inteligencia artificial: pueden contener errores y <strong>no son asesoría legal ni financiera profesional</strong>. Al usar el chat aceptas que las decisiones que tomes son tu responsabilidad. Para casos serios, busca ayuda profesional (hay opciones gratuitas: Defensoría del Pueblo y consultorios jurídicos de universidades).</p>
+    </div>
   </section>
 
   <!-- ============ APRENDE ============ -->
@@ -532,7 +661,8 @@
   <button id="nav-inicio" class="activo" onclick="irA('inicio')"><span class="icono">🏠</span>Inicio</button>
   <button id="nav-cuotas" onclick="irA('cuotas')"><span class="icono">🛒</span>Cuotas</button>
   <button id="nav-tarjeta" onclick="irA('tarjeta')"><span class="icono">💳</span>Tarjeta</button>
-  <button id="nav-plan" onclick="irA('plan')"><span class="icono">🧗</span>Mi plan</button>
+  <button id="nav-plan" onclick="irA('plan')"><span class="icono">🧗</span>Plan</button>
+  <button id="nav-chat" onclick="irA('chat')"><span class="icono">💬</span>Chat</button>
   <button id="nav-aprende" onclick="irA('aprende')"><span class="icono">📚</span>Aprende</button>
 </nav>
 
@@ -953,6 +1083,178 @@ function calcularPlan() {
 }
 
 cargarDeudas();
+
+/* ================= Chat: Clarita y el Doctor Justo ================= */
+
+// URL del Cloudflare Worker que conecta con la IA (ver worker/ y README).
+// Mientras esté vacía, funcionan solo las preguntas frecuentes (sin costo).
+const CHAT_API_URL = "";
+
+const chatPersonas = {
+  financiero: {
+    nombre: "Clarita",
+    saludo: "¡Hola! Soy Clarita 👋 Te ayudo a ordenar tu plata y salir de deudas, sin juzgarte. Toca una pregunta frecuente o escribe la tuya.",
+    faq: [
+      {
+        p: "¿Por dónde empiezo para salir de mis deudas?",
+        r: "Tres pasos, en este orden:\n\n1. Anota TODAS tus deudas: a quién le debes, cuánto y de cuánto es cada cuota. Sin la foto completa no hay plan.\n2. Junta un mini colchón de emergencia ($50–$100). Es lo que evita que una emergencia te mande a más deuda.\n3. Usa el método bola de nieve: paga el mínimo de todas y todo lo extra mándalo a la deuda más pequeña. Cuando esa muera, su cuota pasa a la siguiente.\n\nEn la pestaña 🧗 Plan de esta misma página puedes armar tu plan con tus números reales. ¡Miles de personas han salido así, tú también puedes!",
+      },
+      {
+        p: "¿Pago deudas o ahorro primero?",
+        r: "Las dos cosas, pero en este orden:\n\n1. Primero junta un colchoncito de $50–$100. Sin eso, cualquier emergencia (una medicina, un daño en casa) te obliga a endeudarte de nuevo y el plan se cae.\n2. Después, todo lo extra va a las deudas, empezando por la más pequeña o la más cara.\n3. Ya libre de deudas caras, ahí sí: ahorra en serio.\n\nOjo: si tienes una deuda con interés altísimo (tarjeta al máximo, chulco), esa es prioridad casi absoluta, porque crece más rápido de lo que cualquier ahorro rinde.",
+      },
+      {
+        p: "¿Es buena idea sacar un préstamo para pagar otro?",
+        r: "Depende de una sola cosa: ¿el préstamo nuevo es MÁS BARATO que el viejo?\n\n✅ Tiene sentido si cambias una deuda cara (tarjeta, financiera con interés alto) por una más barata (préstamo de banco o cooperativa con mejor tasa) y CIERRAS la deuda vieja. Eso se llama consolidar.\n\n❌ Es un error si sacas deuda nueva solo para tapar el hueco del mes y sigues gastando igual. Eso es la bola creciendo: hueco tapa hueco, y cada vez más grande.\n\nAntes de firmar, compara el costo total (todas las cuotas sumadas) de las dos opciones, no solo el valor de la cuota.",
+      },
+      {
+        p: "¿Qué es refinanciar y me conviene?",
+        r: "Refinanciar es renegociar tu deuda con el mismo banco o cooperativa: te alargan el plazo o te bajan la cuota para que puedas pagar.\n\n✅ Conviene cuando la cuota ya no te alcanza y estás a punto de atrasarte. Una cuota más baja que SÍ puedes pagar es mejor que caer en mora, dañar tu historial y pagar recargos.\n\n⚠️ Ojo: casi siempre terminas pagando más intereses en total, porque el plazo es más largo. Es un alivio, no un regalo.\n\nConsejo de oro: habla con tu banco ANTES de atrasarte. Con el cliente al día negocian mejor. Y pide siempre la tabla de pagos por escrito.",
+      },
+      {
+        p: "¿Cómo hago un presupuesto si gano poquito o variable?",
+        r: "El presupuesto no es para ricos, ¡es justo para cuando la plata está apretada!\n\n1. Una semana anota TODO lo que gastas, hasta los 50 centavos. La mayoría se sorprende de a dónde se va la plata.\n2. Separa primero, gasta después: el día que te llega plata, aparta ALGO de una vez (aunque sean $5). Si esperas a ver qué sobra, nunca sobra.\n3. Si tu ingreso varía, presupuesta con tu mes MALO, no con el bueno. Lo del mes bueno va al colchón.\n4. Divide en 3 grupos: fijo obligatorio (arriendo, comida, cuotas), variable (transporte, recargas) y gustos. Cuando falta, se recorta en ese orden: gustos primero.",
+      },
+      {
+        p: "¿Vale la pena comprar a cuotas?",
+        r: "La regla de oro: multiplica la cuota por el número de cuotas y súmale la entrada. Ese es el precio REAL. Compáralo con el precio de contado y decide con los ojos abiertos.\n\nEjemplo real: un celular de $250 a \"solo $12 semanales\" por 52 semanas = $624. ¡Pagas 2.5 veces el precio!\n\nPregúntate: ¿esto me ayuda a ganar plata (herramienta de trabajo) o es un gusto? ¿Si ahorro esa misma cuota unas semanas, lo compro de contado y me ahorro la diferencia?\n\nEn la pestaña 🛒 Cuotas de esta página está la calculadora: pon tus números y mira el costo real antes de firmar.",
+      },
+    ],
+  },
+  legal: {
+    nombre: "Doctor Justo",
+    saludo: "Buenas 🤝 Soy el Doctor Justo. Te explico en palabras simples tus derechos y cómo funcionan las leyes de deudas en Ecuador. Ojo: doy información general, no asesoría legal para tu caso específico. ¿Qué quieres saber?",
+    faq: [
+      {
+        p: "¿Puedo ir preso por no pagar mis deudas?",
+        r: "NO. En Ecuador no existe la cárcel por deudas comunes (tarjetas, préstamos, tiendas, financieras). Si un cobrador te amenaza con la cárcel, te está mintiendo para asustarte, y eso es una práctica abusiva.\n\nLa ÚNICA excepción son las pensiones alimenticias: no pagar la pensión de tus hijos sí puede llevar a detención (apremio).\n\nLo que sí puede pasar con deudas comunes: te cobran intereses de mora, te reportan al buró de crédito y, si el acreedor te demanda y gana el juicio, un juez puede ordenar embargo de bienes. Pero preso por deber plata, no.\n\nOjo: esto es información general, no asesoría legal. Para tu caso concreto, un abogado o la Defensoría del Pueblo (gratis) son tu mejor opción.",
+      },
+      {
+        p: "¿Qué me pueden quitar si no pago?",
+        r: "Nadie puede quitarte nada \"por las buenas\". Para embargar tus cosas se necesita TODO esto:\n\n1. Que el acreedor te demande ante un juez.\n2. Que gane el juicio.\n3. Que el juez ordene el embargo, que se hace con funcionarios oficiales, no con cobradores.\n\nUn cobrador que llega a tu casa a llevarse cosas sin orden judicial está actuando fuera de la ley: no le abras, no firmes nada y denuncia.\n\nAdemás hay bienes que por ley no se pueden embargar, como las cosas básicas para vivir y los instrumentos esenciales de tu trabajo.\n\nCaso aparte: si la deuda tiene garantía (compraste a crédito con reserva de dominio, o hipoteca), el bien garantiza esa deuda y el proceso es distinto.\n\nSi ya te demandaron, NO ignores las notificaciones: busca los consultorios jurídicos gratuitos de las universidades.",
+      },
+      {
+        p: "¿Los cobradores pueden llamarme a toda hora y amenazarme?",
+        r: "No. Cobrar una deuda es legal; acosarte, no. Estas prácticas son abusivas y puedes denunciarlas:\n\n🚫 Amenazas e insultos\n🚫 Llamadas a tu trabajo, jefe o familiares para avergonzarte\n🚫 Amenazarte con cárcel (mentira en deudas comunes)\n🚫 Publicar tu deuda o exponerte como \"deudor\" en redes o carteles\n\nQué hacer: guarda pruebas (capturas, grabaciones, números que llaman) y denuncia ante la Defensoría del Pueblo (gratis) o la Superintendencia que regule a la entidad.\n\nY si hay amenazas de violencia (típico del chulco), eso es extorsión, un delito: denuncia en la Fiscalía o al 1800-DELITO.",
+      },
+      {
+        p: "¿Qué es la central de riesgos o buró de crédito?",
+        r: "Es un registro de cómo pagas tus deudas. Bancos, cooperativas y algunas tiendas reportan ahí si pagas a tiempo o te atrasas, y lo consultan antes de prestarte.\n\nMitos y verdades:\n\n✅ Estar \"mal en el buró\" NO es estar en una lista de delincuentes ni te impide trabajar. Solo dificulta que te presten.\n✅ El historial se limpia: después de pagar, el registro negativo desaparece con el tiempo (no es de por vida).\n✅ Tienes derecho a saber qué reportan de ti y a pedir corrección si hay un error.\n❌ \"Sácame del buró por $50\" es casi siempre estafa. Nadie puede borrar un reporte verdadero; solo se actualiza pagando o corrigiendo errores.",
+      },
+      {
+        p: "Me llegó una demanda, ¿qué hago?",
+        r: "Lo más importante: NO la ignores. Si no compareces, el juicio sigue sin ti y pierdes por abandono. Con la demanda en mano:\n\n1. Lee bien quién te demanda, por cuánto y qué juzgado es.\n2. Busca ayuda legal YA. Si no puedes pagar abogado, hay opciones GRATUITAS: los consultorios jurídicos de las universidades y la Defensoría del Pueblo.\n3. Aun demandado, puedes negociar un acuerdo de pago con el acreedor; muchos juicios terminan en acuerdo.\n4. Reúne tus papeles: contratos, tabla de pagos, recibos de lo que ya pagaste.\n\nLos plazos judiciales son cortos: actúa la misma semana.",
+      },
+      {
+        p: "El chulquero me amenaza, ¿qué puedo hacer?",
+        r: "Primero: tu seguridad y la de tu familia van antes que cualquier deuda.\n\nDebes saber:\n\n1. El chulco (prestar con intereses sobre el máximo legal) es un DELITO llamado usura. El que está fuera de la ley es él, no tú.\n2. Las amenazas para cobrar son otro delito: extorsión.\n3. Denuncia en la Fiscalía o al 1800-DELITO. Se puede denunciar de forma reservada. Si hay peligro inmediato, llama al 911.\n4. Guarda todas las pruebas: mensajes, audios, números de cuenta donde pagas.\n\nY si la angustia te está aplastando: no estás solo. Línea gratuita de apoyo emocional: 171 opción 6. Esto tiene salida.",
+      },
+    ],
+  },
+};
+
+let personaActual = "financiero";
+let historial = { financiero: [], legal: [] };
+let chatOcupado = false;
+
+function cambiarPersona(nombre) {
+  personaActual = nombre;
+  document.querySelectorAll(".selector-persona button").forEach((b) => b.classList.remove("activo"));
+  document.getElementById("persona-" + nombre).classList.add("activo");
+  pintarChat();
+}
+
+function pintarChat() {
+  const caja = document.getElementById("chat-mensajes");
+  const persona = chatPersonas[personaActual];
+  caja.innerHTML = "";
+  agregarBurbuja(caja, "bot", persona.saludo, persona.nombre);
+  for (const m of historial[personaActual]) {
+    agregarBurbuja(caja, m.role === "user" ? "usuario" : "bot", m.content, m.role === "user" ? null : persona.nombre);
+  }
+  const chips = document.getElementById("chat-chips");
+  chips.innerHTML = persona.faq
+    .map((f, i) => `<button onclick="usarFaq(${i})">${escaparHtml(f.p)}</button>`)
+    .join("");
+  caja.scrollTop = caja.scrollHeight;
+}
+
+function agregarBurbuja(caja, clase, texto, quien) {
+  const div = document.createElement("div");
+  div.className = "burbuja " + clase;
+  if (quien) {
+    const etiqueta = document.createElement("span");
+    etiqueta.className = "quien";
+    etiqueta.textContent = quien;
+    div.appendChild(etiqueta);
+  }
+  div.appendChild(document.createTextNode(texto));
+  caja.appendChild(div);
+  caja.scrollTop = caja.scrollHeight;
+  return div;
+}
+
+// Pregunta frecuente: respuesta pre-escrita, instantánea y sin costo
+function usarFaq(indice) {
+  if (chatOcupado) return;
+  const persona = chatPersonas[personaActual];
+  const f = persona.faq[indice];
+  historial[personaActual].push({ role: "user", content: f.p });
+  historial[personaActual].push({ role: "assistant", content: f.r });
+  pintarChat();
+}
+
+async function enviarMensaje() {
+  if (chatOcupado) return;
+  const input = document.getElementById("chat-input");
+  const texto = input.value.trim();
+  if (!texto) return;
+
+  const caja = document.getElementById("chat-mensajes");
+  const persona = chatPersonas[personaActual];
+
+  if (!CHAT_API_URL) {
+    agregarBurbuja(caja, "usuario", texto);
+    agregarBurbuja(
+      caja, "bot",
+      "El chat con preguntas propias estará disponible muy pronto. 🙌 Mientras tanto, revisa las preguntas frecuentes de aquí arriba: es muy posible que la tuya ya esté respondida.",
+      persona.nombre,
+    );
+    input.value = "";
+    return;
+  }
+
+  input.value = "";
+  chatOcupado = true;
+  document.getElementById("chat-enviar").disabled = true;
+  historial[personaActual].push({ role: "user", content: texto });
+  agregarBurbuja(caja, "usuario", texto);
+  const burbujaEspera = agregarBurbuja(caja, "bot escribiendo", persona.nombre + " está escribiendo…");
+
+  try {
+    const respuesta = await fetch(CHAT_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        persona: personaActual,
+        mensajes: historial[personaActual].slice(-12),
+      }),
+    });
+    const datos = await respuesta.json();
+    const textoBot = datos.texto || "No pude responder ahora. Intenta de nuevo en un momento.";
+    historial[personaActual].push({ role: "assistant", content: textoBot });
+    burbujaEspera.remove();
+    agregarBurbuja(caja, "bot", textoBot, persona.nombre);
+  } catch (e) {
+    burbujaEspera.remove();
+    agregarBurbuja(caja, "bot", "Parece que no hay conexión. Revisa tu internet e intenta de nuevo. Las preguntas frecuentes funcionan sin conexión. 😉", persona.nombre);
+    historial[personaActual].pop();
+  }
+  chatOcupado = false;
+  document.getElementById("chat-enviar").disabled = false;
+}
+
+pintarChat();
 </script>
 </body>
 </html>
