@@ -1,43 +1,39 @@
-/**
- * Cuentas Claras — Worker del chat (Cloudflare Workers)
- *
- * Intermediario entre la página (GitHub Pages) y la API de Anthropic.
- * Guarda la clave de la API como secreto (ANTHROPIC_API_KEY) para que
- * nunca quede expuesta en el navegador.
- *
- * Es un solo archivo sin dependencias a propósito: se puede pegar
- * directamente en el editor del panel de Cloudflare, sin instalar nada.
- * Por eso llama a la API por HTTP directo en lugar de usar el SDK.
- *
- * Despliegue: ver README.md del proyecto.
- */
+// Cuentas Claras — Worker del chat (Cloudflare Workers)
+//
+// Intermediario entre la página (GitHub Pages) y la API de Anthropic.
+// La clave vive como secreto (ANTHROPIC_API_KEY), nunca en el navegador.
+//
+// NOTA: este archivo es la copia maestra del worker desplegado en
+// https://cuentas-claras-chat.carla-844.workers.dev — si editas aquí,
+// hay que volver a desplegar (ver README).
+//
+// Se usan solo comentarios de línea (//) a propósito: el editor web de
+// Cloudflare autocompleta los cierres de /* */ y daña el pegado/tecleo.
 
-// Dominios autorizados a usar el chat (agrega aquí tu dominio propio si compras uno)
 const ORIGENES_PERMITIDOS = [
   "https://carla-scribano.github.io",
   "http://localhost:8642",
 ];
 
 // Modelo más económico de Anthropic (~$1/$5 por millón de tokens).
-// Elegido a pedido: prioridad costo mínimo. Se puede subir a "claude-sonnet-5"
-// si el proyecto crece y se busca más calidad.
 const MODELO = "claude-haiku-4-5";
 
 // Límites anti-abuso (el chat es público y anónimo)
-const MAX_MENSAJES = 16;          // historial máximo por conversación
+const MAX_MENSAJES = 16;
 const MAX_CARACTERES_MENSAJE = 1000;
 const MAX_TOKENS_RESPUESTA = 600;
 
 const BASE_COMUN = `
 Reglas generales que SIEMPRE cumples:
 - Respondes en español sencillo de Ecuador. Cero jerga técnica; si usas un término financiero o legal, lo explicas en una frase como se lo explicarías a un familiar.
+- En Ecuador la moneda es el dólar estadounidense. SIEMPRE habla de dólares; nunca de pesos ni de otras monedas.
 - Respuestas CORTAS: máximo 3 párrafos breves o una lista de hasta 5 puntos. La persona probablemente lee desde un celular sencillo.
 - Tono cálido y sin juzgar. Nunca haces sentir mal a nadie por sus deudas: "deber plata no te hace mala persona".
 - Nunca recomiendas ni mencionas marcas, bancos, cooperativas o empresas específicas. Hablas en general ("un banco", "una cooperativa", "una financiera").
 - Si detectas desesperación, ideas de hacerse daño o crisis emocional, tu PRIMERA prioridad es la persona: respondes con calidez, le recuerdas que las deudas tienen salida y que no está sola, y le das la línea gratuita de apoyo emocional del Ecuador: 171 opción 6, o el 911 si es una emergencia. Esto va antes que cualquier consejo financiero o legal.
 - Si la pregunta se sale de tu tema (no es de plata, deudas o asuntos legales relacionados), lo dices con simpatía y rediriges a lo tuyo.
 - No inventas datos, tasas exactas ni montos legales. Si no estás seguro de una cifra actual, dices que puede variar y sugieres dónde confirmarla.
-- La página donde vives tiene herramientas gratis: una calculadora de compras a cuotas, un simulador de tarjeta de crédito y un plan "bola de nieve" para salir de deudas. Cuando venga al caso, sugiere usarlas.`;
+- La página donde vives tiene herramientas gratis: una calculadora de compras a cuotas, un simulador de tarjeta de crédito, un plan "bola de nieve" para salir de deudas y un armador de presupuesto. Cuando venga al caso, sugiere usarlas.`;
 
 const PERSONAS = {
   financiero: {
@@ -102,7 +98,7 @@ export default {
     let cuerpo;
     try {
       cuerpo = await request.json();
-    } catch {
+    } catch (e) {
       return Response.json({ error: "JSON inválido" }, { status: 400, headers: cors });
     }
 
