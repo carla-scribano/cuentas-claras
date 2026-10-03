@@ -275,7 +275,37 @@
     --cat-deudas: #be123c;
     --cat-ahorro: #0d9488;
     --cat-gustos: #d97706;
+    --cat-diezmo: #a78bfa; /* contraste 2.7:1 (WARN): compensado con la leyenda que lista cada categoría */
   }
+  .fila-opcional {
+    display: flex; align-items: center; gap: 0.5rem;
+    margin: 0.9rem 0 0.2rem;
+    font-weight: 600; font-size: 0.92rem;
+  }
+  .fila-opcional input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--verde); flex-shrink: 0; }
+  .boton-info {
+    font: inherit; font-size: 0.78rem; font-weight: 700;
+    background: var(--verde-claro); color: var(--verde-oscuro);
+    border: none; border-radius: 99px; padding: 0.25rem 0.7rem;
+    cursor: pointer; margin-left: auto; flex-shrink: 0;
+  }
+
+  .modal-fondo {
+    position: fixed; inset: 0; z-index: 50;
+    background: rgba(28, 25, 23, 0.55);
+    display: none; align-items: center; justify-content: center;
+    padding: 1.2rem;
+  }
+  .modal-fondo.visible { display: flex; }
+  .modal {
+    background: white; border-radius: 16px;
+    max-width: 430px; max-height: 80vh; overflow-y: auto;
+    padding: 1.2rem 1.2rem 1rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+  }
+  .modal h3 { margin: 0 0 0.5rem; color: var(--verde-oscuro); }
+  .modal p, .modal li { font-size: 0.93rem; margin: 0.5rem 0; }
+  .modal ul { margin: 0.5rem 0 0.5rem 1.1rem; }
   .presets { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 0.6rem 0; }
   .presets button {
     font: inherit;
@@ -473,6 +503,16 @@
       <span class="desc">Pregúntale a Clarita (finanzas) o al Doctor Justo (temas legales). Gratis y sin registrarte.</span>
     </button>
 
+    <div class="tarjeta" style="border-color:#86efac">
+      <h3 style="margin-top:0">💚 ¿Te sirvió Cuentas Claras?</h3>
+      <p style="font-size:0.92rem">Este proyecto es gratuito y sin fines de lucro: no vendemos nada, no hay publicidad y no pedimos tus datos. Si quieres que siga creciendo y ayudando a más personas a salir de deudas, hay dos formas de apoyar:</p>
+      <p style="font-size:0.92rem; margin-top:0.5rem"><strong>1. Comparte la página.</strong> Es gratis y es la ayuda más valiosa: que llegue a quien la necesita antes de que firme.</p>
+      <button class="secundario" id="boton-compartir" onclick="compartirPagina()">📲 Compartir con alguien</button>
+      <p style="font-size:0.92rem; margin-top:0.8rem"><strong>2. Aporta voluntariamente.</strong> Tu aporte cubre los costos de mantener la página y el chat funcionando. Nunca será un requisito: aquí todo es y seguirá siendo gratis.</p>
+      <div id="donacion-botones"></div>
+      <p id="donacion-pronto" style="font-size:0.82rem; color:var(--texto-suave); margin-top:0.4rem">Muy pronto habilitaremos una forma segura de aportar.</p>
+    </div>
+
     <div class="nota-apoyo">
       <strong>Si tus deudas te tienen sin dormir:</strong> respira. Una deuda tiene salida, siempre. No eres mala persona por deber plata: es un problema de números, y los números se arreglan con un plan. Si sientes que ya no puedes más, habla con alguien de confianza o busca apoyo emocional gratuito (en Ecuador: línea 171 opción 6, o el 911 en una emergencia).
     </div>
@@ -595,6 +635,12 @@
         <small>Si tu ingreso varía, pon el de un mes malo: lo del mes bueno va al ahorro.</small>
       </label>
       <input type="number" id="p-ingreso" inputmode="decimal" placeholder="Ej: 460" min="0" oninput="cambiarIngreso()">
+
+      <div class="fila-opcional">
+        <input type="checkbox" id="p-diezmo-check" onchange="alternarDiezmo()">
+        <label for="p-diezmo-check">🤲 Separar diezmos y ofrendas <small style="font-weight:400; color:var(--texto-suave)">(opcional)</small></label>
+        <button class="boton-info" onclick="abrirModal('modal-diezmo')">¿Por qué?</button>
+      </div>
 
       <h3 style="margin-top:1rem">Elige un punto de partida</h3>
       <div class="presets">
@@ -761,6 +807,21 @@
   </section>
 
 </main>
+
+<div id="modal-diezmo" class="modal-fondo" onclick="if(event.target===this) cerrarModal('modal-diezmo')">
+  <div class="modal" role="dialog" aria-labelledby="titulo-modal-diezmo">
+    <h3 id="titulo-modal-diezmo">🤲 ¿Por qué apartar diezmos y ofrendas?</h3>
+    <p>Esta casilla es <strong>opcional</strong>: está pensada para quienes la fe es parte de cómo manejan su vida — y su plata. Si es tu caso, apartarlo <strong>primero</strong> (y no "si sobra algo") tiene mucho sentido:</p>
+    <ul>
+      <li><strong>Ordena tus prioridades.</strong> Das primero lo que más valoras y organizas el resto con lo que queda. Es el "separa primero, gasta después" aplicado a lo más importante para ti.</li>
+      <li><strong>Te libera del apego.</strong> Dar con regularidad rompe el miedo al "no me alcanza" y te recuerda que la plata es una herramienta, no el amo.</li>
+      <li><strong>Multiplica la ayuda.</strong> Tus ofrendas sostienen a tu comunidad y llegan a personas que están pasando lo que quizá tú ya pasaste.</li>
+    </ul>
+    <p>El monto es entre tú y tu fe: el 10% es la referencia tradicional del diezmo, no una regla de esta página — ajústalo con el deslizador como cualquier otra categoría.</p>
+    <p>Y si esto no es parte de tu vida, simplemente deja la casilla apagada: tu presupuesto funciona igual de bien. 💚</p>
+    <button class="principal" onclick="cerrarModal('modal-diezmo')">Entendido</button>
+  </div>
+</div>
 
 <nav>
   <button id="nav-inicio" class="activo" onclick="irA('inicio')"><span class="icono">🏠</span>Inicio</button>
@@ -1193,6 +1254,7 @@ cargarDeudas();
 /* ================= Presupuesto: reparte tu plata ================= */
 
 const CATEGORIAS = [
+  { clave: "diezmo", nombre: "🤲 Diezmos y ofrendas", color: "var(--cat-diezmo)" },
   { clave: "vida",   nombre: "🏠 Costos de vida", color: "var(--cat-vida)" },
   { clave: "deudas", nombre: "💳 Deudas",          color: "var(--cat-deudas)" },
   { clave: "ahorro", nombre: "🐖 Ahorro",          color: "var(--cat-ahorro)" },
@@ -1204,15 +1266,31 @@ const PRESETS = {
   saliendo:    { vida: 55, deudas: 25, ahorro: 10, gustos: 10 },
 };
 
-let presupuesto = { ingreso: null, pct: { ...PRESETS.saliendo } };
+let presupuesto = { ingreso: null, diezmoActivo: false, pct: { diezmo: 0, ...PRESETS.saliendo } };
+
+// Categorías visibles según si la persona activó diezmos y ofrendas
+function categoriasActivas() {
+  return presupuesto.diezmoActivo ? CATEGORIAS : CATEGORIAS.filter((c) => c.clave !== "diezmo");
+}
 
 function cargarPresupuesto() {
   try {
     const guardado = JSON.parse(localStorage.getItem("cuentasClarasPresupuesto"));
-    if (guardado && guardado.pct) presupuesto = guardado;
+    if (guardado && guardado.pct) {
+      presupuesto = guardado;
+      presupuesto.diezmoActivo = !!presupuesto.diezmoActivo;
+      if (typeof presupuesto.pct.diezmo !== "number") presupuesto.pct.diezmo = 0;
+    }
   } catch (e) {}
   if (presupuesto.ingreso) document.getElementById("p-ingreso").value = presupuesto.ingreso;
+  document.getElementById("p-diezmo-check").checked = presupuesto.diezmoActivo;
   pintarPresupuesto();
+}
+
+function alternarDiezmo() {
+  presupuesto.diezmoActivo = document.getElementById("p-diezmo-check").checked;
+  // Al activar: aparta 10% y reparte el resto; al apagar: devuelve su % a las demás
+  moverPct("diezmo", presupuesto.diezmoActivo ? 10 : 0);
 }
 
 function guardarPresupuesto() {
@@ -1231,8 +1309,12 @@ function cuotasDelPlan() {
 }
 
 function aplicarPreset(nombre) {
-  presupuesto.pct = { ...PRESETS[nombre] };
-  pintarPresupuesto();
+  presupuesto.pct = { diezmo: 0, ...PRESETS[nombre] };
+  if (presupuesto.diezmoActivo) {
+    moverPct("diezmo", 10); // aparta el 10% y reescala el resto del preset
+  } else {
+    pintarPresupuesto();
+  }
 }
 
 /*
@@ -1265,15 +1347,19 @@ function sugerirDistribucion() {
       pct.vida = 100 - pct.deudas - pct.ahorro - pct.gustos;
     }
   }
-  presupuesto.pct = pct;
-  pintarPresupuesto();
+  presupuesto.pct = { diezmo: 0, ...pct };
+  if (presupuesto.diezmoActivo) {
+    moverPct("diezmo", 10);
+  } else {
+    pintarPresupuesto();
+  }
 }
 
 // Al mover un deslizador, los demás se reparten lo que queda (siempre suma 100)
 function moverPct(clave, valor) {
   valor = Math.min(100, Math.max(0, parseInt(valor) || 0));
   presupuesto.pct[clave] = valor;
-  const otras = CATEGORIAS.map((c) => c.clave).filter((k) => k !== clave);
+  const otras = categoriasActivas().map((c) => c.clave).filter((k) => k !== clave);
   const resto = 100 - valor;
   const sumaOtras = otras.reduce((s, k) => s + presupuesto.pct[k], 0);
   if (sumaOtras <= 0) {
@@ -1295,8 +1381,10 @@ function pintarPresupuesto() {
   const ingreso = presupuesto.ingreso;
   const pct = presupuesto.pct;
 
+  const activas = categoriasActivas();
+
   // Deslizadores
-  document.getElementById("p-controles").innerHTML = CATEGORIAS.map((c) => `
+  document.getElementById("p-controles").innerHTML = activas.map((c) => `
     <div class="fila-pct">
       <span><span class="punto" style="background:${c.color}"></span>${c.nombre}</span>
       <span><span class="valor-pct">${pct[c.clave]}%</span>${ingreso ? `<span class="valor-dinero">${dinero((ingreso * pct[c.clave]) / 100)}</span>` : ""}</span>
@@ -1307,10 +1395,10 @@ function pintarPresupuesto() {
   `).join("");
 
   // Dona (pastel con hueco): tramos de conic-gradient con separador blanco
-  const visibles = CATEGORIAS.filter((c) => pct[c.clave] > 0);
+  const visibles = activas.filter((c) => pct[c.clave] > 0);
   const gap = visibles.length > 1 ? 0.7 : 0;
   let tramos = [], acumulado = 0;
-  for (const c of CATEGORIAS) {
+  for (const c of activas) {
     const p = pct[c.clave];
     if (p <= 0) continue;
     const g = Math.min(gap, p / 2);
@@ -1324,7 +1412,7 @@ function pintarPresupuesto() {
   document.getElementById("p-dona-sub").textContent = ingreso ? "al mes" : "aquí arriba ☝️";
 
   // Leyenda con montos exactos (sirve también como tabla accesible)
-  document.getElementById("p-leyenda").innerHTML = CATEGORIAS.map((c) => `
+  document.getElementById("p-leyenda").innerHTML = activas.map((c) => `
     <div class="item">
       <span class="punto" style="background:${c.color}"></span>
       <span class="nombre">${c.nombre}</span>
@@ -1374,6 +1462,47 @@ function pintarFeedbackPresupuesto() {
 }
 
 cargarPresupuesto();
+
+/* ================= Modales ================= */
+function abrirModal(id) { document.getElementById(id).classList.add("visible"); }
+function cerrarModal(id) { document.getElementById(id).classList.remove("visible"); }
+
+/* ================= Apoyo al proyecto ================= */
+
+// Enlaces para aportes voluntarios. Cuando existan, agrégalos así:
+//   { nombre: "Aportar por PayPal", url: "https://paypal.me/USUARIO" },
+//   { nombre: "Aportar por deUna", url: "https://..." },
+const ENLACES_DONACION = [];
+
+function pintarDonaciones() {
+  const caja = document.getElementById("donacion-botones");
+  const pronto = document.getElementById("donacion-pronto");
+  if (ENLACES_DONACION.length === 0) return; // se mantiene el aviso de "muy pronto"
+  pronto.style.display = "none";
+  caja.innerHTML = ENLACES_DONACION
+    .map((e) => `<a class="secundario" style="text-decoration:none; display:inline-block; margin-right:0.5rem" href="${e.url}" target="_blank" rel="noopener">💚 ${escaparHtml(e.nombre)}</a>`)
+    .join("");
+}
+
+async function compartirPagina() {
+  const boton = document.getElementById("boton-compartir");
+  const datos = {
+    title: "Cuentas Claras",
+    text: "Herramientas gratis para salir de deudas y manejar tu plata, sin juzgarte. Antes de comprar a cuotas, ¡calcula cuánto pagarás en verdad!",
+    url: "https://carla-scribano.github.io/cuentas-claras/",
+  };
+  try {
+    if (navigator.share) {
+      await navigator.share(datos);
+    } else {
+      await navigator.clipboard.writeText(datos.url);
+      boton.textContent = "✅ ¡Enlace copiado! Pégalo donde quieras";
+      setTimeout(() => { boton.textContent = "📲 Compartir con alguien"; }, 3000);
+    }
+  } catch (e) { /* la persona canceló el compartir: no pasa nada */ }
+}
+
+pintarDonaciones();
 
 /* ================= Chat: Clarita y el Doctor Justo ================= */
 
