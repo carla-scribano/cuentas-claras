@@ -1,0 +1,4 @@
+# Configuración de despliegue del worker del chat (npx wrangler deploy)
+name = "cuentas-claras-chat"
+main = "worker.js"
+compatibility_date = "2026-10-01"
