@@ -265,8 +265,69 @@
     flex: 1;
     max-width: 110px;
   }
-  nav button .icono { font-size: 1.3rem; }
+  nav button { font-size: 0.62rem; padding: 0.3rem 0.2rem; }
+  nav button .icono { font-size: 1.25rem; }
   nav button.activo { color: var(--verde); font-weight: 700; background: var(--verde-claro); }
+
+  /* ---------- Presupuesto ---------- */
+  :root {
+    --cat-vida: #4f46e5;
+    --cat-deudas: #be123c;
+    --cat-ahorro: #0d9488;
+    --cat-gustos: #d97706;
+  }
+  .presets { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 0.6rem 0; }
+  .presets button {
+    font: inherit;
+    font-size: 0.85rem;
+    background: white;
+    border: 1.5px solid var(--borde);
+    border-radius: 10px;
+    padding: 0.55rem 0.4rem;
+    cursor: pointer;
+    color: var(--texto);
+  }
+  .presets button strong { display: block; color: var(--verde-oscuro); }
+  .presets button.sugerido { border-color: var(--verde); background: var(--verde-claro); grid-column: 1 / -1; }
+
+  .control-pct { margin: 0.75rem 0; }
+  .control-pct .fila-pct {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 0.9rem; font-weight: 600; margin-bottom: 2px;
+  }
+  .control-pct .punto {
+    display: inline-block; width: 11px; height: 11px; border-radius: 3px;
+    margin-right: 6px; vertical-align: baseline;
+  }
+  .control-pct .valor-pct { font-weight: 800; }
+  .control-pct .valor-dinero { font-weight: 400; color: var(--texto-suave); font-size: 0.8rem; margin-left: 6px; }
+  .control-pct input[type="range"] { width: 100%; accent-color: var(--verde); }
+
+  .dona-envoltura { display: flex; flex-direction: column; align-items: center; padding: 0.5rem 0; }
+  .dona {
+    width: 205px; height: 205px; border-radius: 50%;
+    position: relative;
+  }
+  .dona-centro {
+    position: absolute; inset: 52px;
+    background: white; border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+  }
+  .dona-centro .monto { font-size: 1.15rem; font-weight: 800; color: var(--verde-oscuro); }
+  .dona-centro .sub { font-size: 0.7rem; color: var(--texto-suave); }
+
+  .leyenda { width: 100%; margin-top: 0.8rem; }
+  .leyenda .item {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.35rem 0; border-bottom: 1px solid var(--borde);
+    font-size: 0.92rem;
+  }
+  .leyenda .item:last-child { border-bottom: none; }
+  .leyenda .punto { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .leyenda .nombre { flex: 1; }
+  .leyenda .cifra { font-weight: 700; }
+  .leyenda .pct { color: var(--texto-suave); font-size: 0.82rem; width: 40px; text-align: right; }
 
   /* ---------- Chat ---------- */
   .selector-persona { display: flex; gap: 0.6rem; margin: 0.8rem 0; }
@@ -400,6 +461,12 @@
       <span class="desc">Deuda buena vs. deuda mala, cómo funcionan los intereses, señales de alerta y tus derechos.</span>
     </button>
 
+    <button class="tarjeta-boton" onclick="irA('dinero')">
+      <span class="emoji">💰</span>
+      <strong>Quiero organizar mi plata</strong>
+      <span class="desc">Reparte tu ingreso entre vivir, deudas, ahorro y gustos, y míralo en un pastel. Con sugerencia según tus deudas.</span>
+    </button>
+
     <button class="tarjeta-boton" onclick="irA('chat')">
       <span class="emoji">💬</span>
       <strong>Tengo una pregunta</strong>
@@ -516,6 +583,44 @@
 
     <div id="d-resultado" class="resultado"></div>
     <p class="aviso-privacidad">🔒 Tus deudas se guardan solo en este teléfono. Nadie más las ve.</p>
+  </section>
+
+  <!-- ============ PRESUPUESTO ============ -->
+  <section id="pantalla-dinero" class="pantalla">
+    <h2>💰 Reparte tu plata</h2>
+    <p class="intro">Decide a dónde va tu ingreso ANTES de gastarlo: tanto para vivir, tanto para deudas, tanto para ahorrar. Mira el pastel y ajusta hasta que te cuadre.</p>
+
+    <div class="tarjeta">
+      <label for="p-ingreso">¿Cuánto te ingresa al mes?
+        <small>Si tu ingreso varía, pon el de un mes malo: lo del mes bueno va al ahorro.</small>
+      </label>
+      <input type="number" id="p-ingreso" inputmode="decimal" placeholder="Ej: 460" min="0" oninput="cambiarIngreso()">
+
+      <h3 style="margin-top:1rem">Elige un punto de partida</h3>
+      <div class="presets">
+        <button class="sugerido" onclick="sugerirDistribucion()"><strong>✨ Sugerido para mí</strong>Según las deudas de tu Plan 🧗</button>
+        <button onclick="aplicarPreset('equilibrado')"><strong>🧘 Sin deudas</strong>50 / 30 / 20</button>
+        <button onclick="aplicarPreset('saliendo')"><strong>🧗 Saliendo de deudas</strong>Deudas 25%</button>
+      </div>
+
+      <h3>Ajusta a tu gusto</h3>
+      <div class="control-pct" id="p-controles"></div>
+    </div>
+
+    <div class="tarjeta">
+      <div class="dona-envoltura">
+        <div class="dona" id="p-dona" role="img" aria-label="Gráfico de cómo se reparte tu ingreso">
+          <div class="dona-centro">
+            <span class="monto" id="p-dona-monto">—</span>
+            <span class="sub" id="p-dona-sub">al mes</span>
+          </div>
+        </div>
+        <div class="leyenda" id="p-leyenda"></div>
+      </div>
+    </div>
+
+    <div id="p-feedback"></div>
+    <p class="aviso-privacidad">🔒 Tu presupuesto se guarda solo en este teléfono.</p>
   </section>
 
   <!-- ============ CHAT ============ -->
@@ -662,6 +767,7 @@
   <button id="nav-cuotas" onclick="irA('cuotas')"><span class="icono">🛒</span>Cuotas</button>
   <button id="nav-tarjeta" onclick="irA('tarjeta')"><span class="icono">💳</span>Tarjeta</button>
   <button id="nav-plan" onclick="irA('plan')"><span class="icono">🧗</span>Plan</button>
+  <button id="nav-dinero" onclick="irA('dinero')"><span class="icono">💰</span>Plata</button>
   <button id="nav-chat" onclick="irA('chat')"><span class="icono">💬</span>Chat</button>
   <button id="nav-aprende" onclick="irA('aprende')"><span class="icono">📚</span>Aprende</button>
 </nav>
@@ -1083,6 +1189,191 @@ function calcularPlan() {
 }
 
 cargarDeudas();
+
+/* ================= Presupuesto: reparte tu plata ================= */
+
+const CATEGORIAS = [
+  { clave: "vida",   nombre: "🏠 Costos de vida", color: "var(--cat-vida)" },
+  { clave: "deudas", nombre: "💳 Deudas",          color: "var(--cat-deudas)" },
+  { clave: "ahorro", nombre: "🐖 Ahorro",          color: "var(--cat-ahorro)" },
+  { clave: "gustos", nombre: "🎉 Gustos",          color: "var(--cat-gustos)" },
+];
+
+const PRESETS = {
+  equilibrado: { vida: 50, deudas: 0,  ahorro: 20, gustos: 30 },
+  saliendo:    { vida: 55, deudas: 25, ahorro: 10, gustos: 10 },
+};
+
+let presupuesto = { ingreso: null, pct: { ...PRESETS.saliendo } };
+
+function cargarPresupuesto() {
+  try {
+    const guardado = JSON.parse(localStorage.getItem("cuentasClarasPresupuesto"));
+    if (guardado && guardado.pct) presupuesto = guardado;
+  } catch (e) {}
+  if (presupuesto.ingreso) document.getElementById("p-ingreso").value = presupuesto.ingreso;
+  pintarPresupuesto();
+}
+
+function guardarPresupuesto() {
+  try { localStorage.setItem("cuentasClarasPresupuesto", JSON.stringify(presupuesto)); } catch (e) {}
+}
+
+function cambiarIngreso() {
+  const v = parseFloat(document.getElementById("p-ingreso").value);
+  presupuesto.ingreso = v > 0 ? v : null;
+  pintarPresupuesto();
+}
+
+// Suma de cuotas mínimas de las deudas anotadas en el Plan 🧗
+function cuotasDelPlan() {
+  return deudas.reduce((s, d) => s + d.cuota, 0);
+}
+
+function aplicarPreset(nombre) {
+  presupuesto.pct = { ...PRESETS[nombre] };
+  pintarPresupuesto();
+}
+
+/*
+ * "Sugerido para mí": arma la distribución a partir de las deudas reales
+ * del Plan — cubre las cuotas mínimas y deja un extra para la bola de nieve.
+ */
+function sugerirDistribucion() {
+  const ingreso = presupuesto.ingreso;
+  if (!ingreso) {
+    document.getElementById("p-ingreso").focus();
+    document.getElementById("p-feedback").innerHTML =
+      '<div class="veredicto amarillo"><span class="titulo">Primero tu ingreso</span>Pon arriba cuánto te ingresa al mes y vuelve a tocar "Sugerido para mí".</div>';
+    return;
+  }
+  const cuotas = cuotasDelPlan();
+  let pct;
+  if (cuotas <= 0) {
+    pct = { ...PRESETS.equilibrado };
+  } else {
+    const minimoDeudas = Math.ceil((cuotas / ingreso) * 100);
+    if (minimoDeudas >= 70) {
+      // Las cuotas se comen casi todo: el presupuesto no alcanza, hay que renegociar
+      pct = { vida: 30, deudas: 65, ahorro: 5, gustos: 0 };
+    } else if (minimoDeudas >= 45) {
+      pct = { deudas: Math.min(minimoDeudas + 3, 60), ahorro: 5, gustos: 3, vida: 0 };
+      pct.vida = 100 - pct.deudas - pct.ahorro - pct.gustos;
+    } else {
+      // Cuotas manejables: mínimos + ~8 puntos extra para la bola de nieve
+      pct = { deudas: Math.min(minimoDeudas + 8, 40), ahorro: 10, gustos: 8, vida: 0 };
+      pct.vida = 100 - pct.deudas - pct.ahorro - pct.gustos;
+    }
+  }
+  presupuesto.pct = pct;
+  pintarPresupuesto();
+}
+
+// Al mover un deslizador, los demás se reparten lo que queda (siempre suma 100)
+function moverPct(clave, valor) {
+  valor = Math.min(100, Math.max(0, parseInt(valor) || 0));
+  presupuesto.pct[clave] = valor;
+  const otras = CATEGORIAS.map((c) => c.clave).filter((k) => k !== clave);
+  const resto = 100 - valor;
+  const sumaOtras = otras.reduce((s, k) => s + presupuesto.pct[k], 0);
+  if (sumaOtras <= 0) {
+    otras.forEach((k, i) => { presupuesto.pct[k] = Math.floor(resto / otras.length) + (i === 0 ? resto % otras.length : 0); });
+  } else {
+    let asignado = 0;
+    otras.forEach((k) => {
+      presupuesto.pct[k] = Math.floor((presupuesto.pct[k] * resto) / sumaOtras);
+      asignado += presupuesto.pct[k];
+    });
+    // Lo que falte por redondeo va a la categoría más grande de las otras
+    const mayor = otras.reduce((a, b) => (presupuesto.pct[a] >= presupuesto.pct[b] ? a : b));
+    presupuesto.pct[mayor] += resto - asignado;
+  }
+  pintarPresupuesto();
+}
+
+function pintarPresupuesto() {
+  const ingreso = presupuesto.ingreso;
+  const pct = presupuesto.pct;
+
+  // Deslizadores
+  document.getElementById("p-controles").innerHTML = CATEGORIAS.map((c) => `
+    <div class="fila-pct">
+      <span><span class="punto" style="background:${c.color}"></span>${c.nombre}</span>
+      <span><span class="valor-pct">${pct[c.clave]}%</span>${ingreso ? `<span class="valor-dinero">${dinero((ingreso * pct[c.clave]) / 100)}</span>` : ""}</span>
+    </div>
+    <input type="range" min="0" max="100" step="1" value="${pct[c.clave]}"
+           aria-label="Porcentaje para ${c.nombre}"
+           oninput="moverPct('${c.clave}', this.value)">
+  `).join("");
+
+  // Dona (pastel con hueco): tramos de conic-gradient con separador blanco
+  const visibles = CATEGORIAS.filter((c) => pct[c.clave] > 0);
+  const gap = visibles.length > 1 ? 0.7 : 0;
+  let tramos = [], acumulado = 0;
+  for (const c of CATEGORIAS) {
+    const p = pct[c.clave];
+    if (p <= 0) continue;
+    const g = Math.min(gap, p / 2);
+    tramos.push(`white ${acumulado}% ${acumulado + g}%`);
+    tramos.push(`${c.color} ${acumulado + g}% ${acumulado + p}%`);
+    acumulado += p;
+  }
+  document.getElementById("p-dona").style.background =
+    tramos.length ? `conic-gradient(${tramos.join(",")})` : "#e7e5e4";
+  document.getElementById("p-dona-monto").textContent = ingreso ? dinero(ingreso) : "Pon tu ingreso";
+  document.getElementById("p-dona-sub").textContent = ingreso ? "al mes" : "aquí arriba ☝️";
+
+  // Leyenda con montos exactos (sirve también como tabla accesible)
+  document.getElementById("p-leyenda").innerHTML = CATEGORIAS.map((c) => `
+    <div class="item">
+      <span class="punto" style="background:${c.color}"></span>
+      <span class="nombre">${c.nombre}</span>
+      <span class="cifra">${ingreso ? dinero((ingreso * pct[c.clave]) / 100) : "—"}</span>
+      <span class="pct">${pct[c.clave]}%</span>
+    </div>
+  `).join("");
+
+  pintarFeedbackPresupuesto();
+  guardarPresupuesto();
+}
+
+function pintarFeedbackPresupuesto() {
+  const ingreso = presupuesto.ingreso;
+  const pct = presupuesto.pct;
+  const mensajes = [];
+
+  if (ingreso) {
+    const cuotas = cuotasDelPlan();
+    const paraDeudas = (ingreso * pct.deudas) / 100;
+
+    if (cuotas > 0) {
+      const cargaReal = cuotas / ingreso;
+      if (cargaReal > 0.45) {
+        mensajes.push(`<div class="veredicto rojo"><span class="titulo">🚨 Tus cuotas pesan demasiado</span>Solo tus cuotas mínimas (${dinero(cuotas)}) ya se llevan el ${Math.round(cargaReal * 100)}% de tu ingreso. Más del 45% es señal de alerta. No esperes a atrasarte: habla YA con tus bancos y pide refinanciar — es tu derecho, y con el cliente al día negocian mejor.</div>`);
+      }
+      if (paraDeudas < cuotas - 0.5) {
+        mensajes.push(`<div class="veredicto amarillo"><span class="titulo">⚠️ No alcanza para las cuotas</span>Tus cuotas mínimas suman ${dinero(cuotas)}, pero este reparto solo destina ${dinero(paraDeudas)} a deudas. Faltan ${dinero(cuotas - paraDeudas)}. Sube el % de deudas (o usa "Sugerido para mí").</div>`);
+      } else if (paraDeudas > cuotas + 1) {
+        mensajes.push(`<div class="veredicto verde"><span class="titulo">💪 Tienes bola de nieve</span>Después de pagar tus mínimos (${dinero(cuotas)}) te quedan ${dinero(paraDeudas - cuotas)} extra para deudas. Ve a 🧗 Plan y ponlos como "extra al mes": cada dólar ahí te saca meses antes.</div>`);
+      }
+    }
+
+    if (pct.ahorro > 0) {
+      const ahorroMes = (ingreso * pct.ahorro) / 100;
+      mensajes.push(`<div class="veredicto verde"><span class="titulo">🐖 Tu colchón crece</span>Ahorrando ${dinero(ahorroMes)} al mes, en un año tienes ${dinero(ahorroMes * 12)}. Ese colchón es lo que evita que una emergencia te mande al chulco o a la tarjeta.</div>`);
+    } else {
+      mensajes.push(`<div class="veredicto amarillo"><span class="titulo">🤔 Sin nada de ahorro</span>Aunque sea un 2–5%, aparta algo: sin colchón, cualquier emergencia se paga con deuda nueva. Separa primero, gasta después.</div>`);
+    }
+
+    if (pct.vida < 40) {
+      mensajes.push(`<div class="veredicto amarillo"><span class="titulo">🏠 ¿Te alcanza para vivir?</span>Menos del 40% para costos de vida (comida, arriendo, transporte, servicios) suele ser poco realista. Un presupuesto que no se puede cumplir se abandona: mejor honesto que perfecto.</div>`);
+    }
+  }
+
+  document.getElementById("p-feedback").innerHTML = mensajes.join("");
+}
+
+cargarPresupuesto();
 
 /* ================= Chat: Clarita y el Doctor Justo ================= */
 
