@@ -1507,8 +1507,7 @@ pintarDonaciones();
 /* ================= Chat: Clarita y el Doctor Justo ================= */
 
 // URL del Cloudflare Worker que conecta con la IA (ver worker/ y README).
-// Mientras esté vacía, funcionan solo las preguntas frecuentes (sin costo).
-const CHAT_API_URL = "";
+const CHAT_API_URL = "https://cuentas-claras-chat.carla-844.workers.dev";
 
 const chatPersonas = {
   financiero: {
@@ -1608,7 +1607,11 @@ function agregarBurbuja(caja, clase, texto, quien) {
     etiqueta.textContent = quien;
     div.appendChild(etiqueta);
   }
-  div.appendChild(document.createTextNode(texto));
+  // La IA responde con **negritas** estilo Markdown: se escapa el HTML
+  // primero (seguridad) y luego se convierten solo las negritas.
+  const cuerpo = document.createElement("span");
+  cuerpo.innerHTML = escaparHtml(texto).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  div.appendChild(cuerpo);
   caja.appendChild(div);
   caja.scrollTop = caja.scrollHeight;
   return div;
