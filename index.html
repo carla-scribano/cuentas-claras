@@ -319,6 +319,7 @@
   }
   .presets button strong { display: block; color: var(--verde-oscuro); }
   .presets button.sugerido { border-color: var(--verde); background: var(--verde-claro); grid-column: 1 / -1; }
+  .presets button.activo { border-color: var(--verde); background: var(--verde-claro); }
 
   .control-pct { margin: 0.75rem 0; }
   .control-pct .fila-pct {
@@ -593,19 +594,41 @@
       <label for="d-nombre">¿A quién le debes?</label>
       <input type="text" id="d-nombre" placeholder="Ej: Tarjeta banco, celular, préstamo de mi tía">
 
-      <div class="fila">
-        <div>
-          <label for="d-saldo">¿Cuánto debes?</label>
-          <input type="number" id="d-saldo" inputmode="decimal" placeholder="Ej: 400" min="0">
-        </div>
-        <div>
-          <label for="d-cuota">Cuota mensual mínima</label>
-          <input type="number" id="d-cuota" inputmode="decimal" placeholder="Ej: 25" min="0">
-        </div>
+      <label>¿Qué tipo de deuda es?</label>
+      <div class="presets" style="margin:0.3rem 0 0.2rem">
+        <button type="button" id="tipo-rotativa" class="activo" onclick="cambiarTipoDeuda('rotativa')"><strong>💳 Tarjeta o similar</strong>Debes un monto y abonas cada mes</button>
+        <button type="button" id="tipo-fija" onclick="cambiarTipoDeuda('fija')"><strong>🏦 Préstamo a cuotas</strong>Cuota fija por tantos meses</button>
       </div>
 
-      <label for="d-tasa">Interés anual (%) <small>Si no sabes, deja 16. Si es sin interés (ej: le debes a un familiar), pon 0.</small></label>
-      <input type="number" id="d-tasa" inputmode="decimal" value="16" min="0" max="500">
+      <div id="campos-rotativa">
+        <div class="fila">
+          <div>
+            <label for="d-saldo">¿Cuánto debes?</label>
+            <input type="number" id="d-saldo" inputmode="decimal" placeholder="Ej: 400" min="0">
+          </div>
+          <div>
+            <label for="d-cuota">Cuota mensual mínima</label>
+            <input type="number" id="d-cuota" inputmode="decimal" placeholder="Ej: 25" min="0">
+          </div>
+        </div>
+        <label for="d-tasa">Interés anual (%) <small>Si no sabes, deja 16. Si es sin interés (ej: le debes a un familiar), pon 0.</small></label>
+        <input type="number" id="d-tasa" inputmode="decimal" value="16" min="0" max="500">
+      </div>
+
+      <div id="campos-fija" style="display:none">
+        <div class="fila">
+          <div>
+            <label for="df-cuota">¿De cuánto es la cuota?</label>
+            <input type="number" id="df-cuota" inputmode="decimal" placeholder="Ej: 50" min="0">
+          </div>
+          <div>
+            <label for="df-ncuotas">¿Cuántas cuotas te faltan?</label>
+            <input type="number" id="df-ncuotas" inputmode="numeric" placeholder="Ej: 18" min="1">
+          </div>
+        </div>
+        <label for="df-tasa">Interés anual (%) <small>Sale en tu tabla de pagos. Si no sabes, deja 16; si te prestaron sin interés, pon 0.</small></label>
+        <input type="number" id="df-tasa" inputmode="decimal" value="16" min="0" max="500">
+      </div>
 
       <button class="secundario" onclick="agregarDeuda()">+ Agregar esta deuda</button>
 
@@ -1097,23 +1120,56 @@ function guardarDeudas() {
   try { localStorage.setItem('cuentasClarasDeudas', JSON.stringify(deudas)); } catch (e) {}
 }
 
+let tipoDeudaActual = "rotativa";
+
+function cambiarTipoDeuda(tipo) {
+  tipoDeudaActual = tipo;
+  document.getElementById("tipo-rotativa").classList.toggle("activo", tipo === "rotativa");
+  document.getElementById("tipo-fija").classList.toggle("activo", tipo === "fija");
+  document.getElementById("campos-rotativa").style.display = tipo === "rotativa" ? "" : "none";
+  document.getElementById("campos-fija").style.display = tipo === "fija" ? "" : "none";
+}
+
 function agregarDeuda() {
   const nombre = document.getElementById('d-nombre').value.trim();
-  const saldo = parseFloat(document.getElementById('d-saldo').value);
-  const cuota = parseFloat(document.getElementById('d-cuota').value);
-  const tasa = parseFloat(document.getElementById('d-tasa').value) || 0;
-
-  if (!nombre || !saldo || saldo <= 0 || !cuota || cuota <= 0) {
-    alert('Necesito el nombre, cuánto debes y la cuota mensual.');
+  if (!nombre) {
+    alert('Ponle un nombre a la deuda (¿a quién le debes?).');
     return;
   }
-  deudas.push({ nombre, saldo, cuota, tasa });
+
+  if (tipoDeudaActual === 'fija') {
+    // Préstamo a cuotas fijas (mutuo): el capital pendiente se calcula
+    // a partir de la cuota, las cuotas que faltan y la tasa (valor presente).
+    const cuota = parseFloat(document.getElementById('df-cuota').value);
+    const n = parseInt(document.getElementById('df-ncuotas').value);
+    const tasa = parseFloat(document.getElementById('df-tasa').value) || 0;
+    if (!cuota || cuota <= 0 || !n || n <= 0) {
+      alert('Necesito el valor de la cuota y cuántas cuotas te faltan.');
+      return;
+    }
+    const i = Math.pow(1 + tasa / 100, 1 / 12) - 1;
+    const saldo = i > 0 ? (cuota * (1 - Math.pow(1 + i, -n))) / i : cuota * n;
+    deudas.push({ nombre, saldo: Math.round(saldo * 100) / 100, cuota, tasa, tipo: 'fija', cuotasPlan: n });
+    document.getElementById('df-cuota').value = '';
+    document.getElementById('df-ncuotas').value = '';
+    document.getElementById('df-tasa').value = '16';
+  } else {
+    const saldo = parseFloat(document.getElementById('d-saldo').value);
+    const cuota = parseFloat(document.getElementById('d-cuota').value);
+    const tasa = parseFloat(document.getElementById('d-tasa').value) || 0;
+    if (!saldo || saldo <= 0 || !cuota || cuota <= 0) {
+      alert('Necesito cuánto debes y la cuota mensual.');
+      return;
+    }
+    deudas.push({ nombre, saldo, cuota, tasa, tipo: 'rotativa' });
+    document.getElementById('d-saldo').value = '';
+    document.getElementById('d-cuota').value = '';
+    document.getElementById('d-tasa').value = '16';
+  }
+
   guardarDeudas();
   pintarDeudas();
   document.getElementById('d-nombre').value = '';
-  document.getElementById('d-saldo').value = '';
-  document.getElementById('d-cuota').value = '';
-  document.getElementById('d-tasa').value = '16';
 }
 
 function borrarDeuda(indice) {
@@ -1133,7 +1189,9 @@ function pintarDeudas() {
     <div class="deuda-item">
       <div class="info">
         <div class="nombre">${escaparHtml(d.nombre)}</div>
-        <div class="detalle">Debes ${dinero(d.saldo)} · cuota ${dinero(d.cuota)}/mes · ${d.tasa}% anual</div>
+        <div class="detalle">${d.tipo === "fija"
+          ? `Te faltan ${d.cuotasPlan} cuotas de ${dinero(d.cuota)} · ${d.tasa}% anual (≈ ${dinero(d.saldo)} de capital)`
+          : `Debes ${dinero(d.saldo)} · cuota ${dinero(d.cuota)}/mes · ${d.tasa}% anual`}</div>
       </div>
       <button onclick="borrarDeuda(${idx})" aria-label="Borrar deuda">✕</button>
     </div>
