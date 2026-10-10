@@ -1,4 +1,6 @@
-# 💡 Cuentas Claras
+# 💡 Libre de Deudas
+
+> Antes se llamaba "Cuentas Claras"; se renombró en octubre 2026 porque ya existe una app Android con ese nombre. La URL pública se mantiene por ahora.
 
 Herramientas gratuitas de educación financiera para Ecuador y Latinoamérica. Proyecto social, sin fines de lucro.
 
@@ -44,7 +46,7 @@ python3 -m http.server 8080
 
 1. Crear un repositorio en GitHub y subir estos archivos.
 2. Activar **GitHub Pages** (Settings → Pages → deploy from branch `main`).
-3. Opcional: comprar un dominio corto y fácil de dictar (ej: `cuentasclaras.ec`) — es el único costo del proyecto.
+3. Opcional: comprar un dominio corto y fácil de dictar (ej: `libredeudas.ec`) — es el único costo del proyecto.
 
 ## Cómo activar el chat con IA (una sola vez, ~15 minutos)
 
