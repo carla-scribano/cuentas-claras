@@ -131,9 +131,9 @@ async function manejarFondo(cuerpo, env, cors) {
       Authorization: "Bearer " + env.RESEND_API_KEY,
     },
     body: JSON.stringify({
-      from: "Libre de Deudas <onboarding@resend.dev>",
+      from: "Fondo Solidario Berit <onboarding@resend.dev>",
       to: [env.FONDO_EMAIL_DESTINO],
-      subject: "Fondo Solidario: solicitud de " + campos.nombre,
+      subject: "Fondo Solidario Berit: solicitud de " + campos.nombre,
       text: lineas.join("\n"),
     }),
   });
