@@ -871,13 +871,24 @@
 
     <div class="tarjeta">
       <h3 style="margin-top:0">Cómo funciona</h3>
-      <p style="font-size:0.95rem"><strong>1.</strong> Llenas la solicitud de abajo (2 minutos).</p>
-      <p style="font-size:0.95rem"><strong>2.</strong> Si tu caso puede avanzar, te escribimos por WhatsApp para conversar con calma sobre tu situación.</p>
-      <p style="font-size:0.95rem"><strong>3.</strong> Si tu caso es seleccionado, acordamos juntos el monto y un plan de pago que sí puedas cumplir.</p>
+      <p style="font-size:0.95rem"><strong>1.</strong> Organizas tus finanzas aquí mismo en la app: anotas tus deudas en el Plan 🧗 y armas tu presupuesto en Plata 💰. Es el único requisito para aplicar.</p>
+      <p style="font-size:0.95rem"><strong>2.</strong> Llenas la solicitud de abajo (2 minutos).</p>
+      <p style="font-size:0.95rem"><strong>3.</strong> Si tu caso puede avanzar, te escribimos por WhatsApp para conversar con calma sobre tu situación.</p>
+      <p style="font-size:0.95rem"><strong>4.</strong> Si tu caso es seleccionado, acordamos juntos el monto y un plan de pago que sí puedas cumplir.</p>
       <p style="font-size:0.9rem; color:var(--texto-suave); margin-top:0.6rem">Hablando claro: los cupos se asignan poco a poco, así que aplicar no garantiza el préstamo. Si no te escribimos pronto, puedes volver a aplicar más adelante — tu solicitud no queda guardada en ningún lado.</p>
     </div>
 
-    <div class="tarjeta" id="fondo-formulario">
+    <div class="tarjeta" id="fondo-requisitos">
+      <h3 style="margin-top:0">📋 Tu primer paso</h3>
+      <p style="font-size:0.95rem">Este fondo es para quien ya decidió tomar el control de su plata. Por eso, antes de aplicar te pedimos una sola cosa: organiza tus finanzas aquí mismo en la app. Es gratis, toma unos minutos y te sirve a ti más que a nadie.</p>
+      <p style="font-size:0.95rem; margin-top:0.7rem"><span id="req-plan-icono">⬜</span> <strong>Anota tus deudas en el Plan</strong> — así sabremos exactamente de qué deuda te ayudamos a salir.</p>
+      <button class="secundario" id="req-plan-boton" onclick="irA('plan')">🧗 Ir al Plan</button>
+      <p style="font-size:0.95rem; margin-top:0.7rem"><span id="req-presupuesto-icono">⬜</span> <strong>Arma tu presupuesto</strong> — pon tu ingreso en Plata y reparte tus porcentajes.</p>
+      <button class="secundario" id="req-presupuesto-boton" onclick="irA('dinero')">💰 Ir a Plata</button>
+      <p style="font-size:0.9rem; color:var(--texto-suave); margin-top:0.7rem">Cuando tengas las dos cosas listas, vuelve aquí: la solicitud se abre sola. Todo queda en tu teléfono, como siempre.</p>
+    </div>
+
+    <div class="tarjeta" id="fondo-formulario" style="display:none">
       <h3 style="margin-top:0">📝 Solicitud</h3>
       <label for="f-nombre">¿Cómo te llamas?</label>
       <input type="text" id="f-nombre" maxlength="100" placeholder="Tu nombre">
@@ -892,7 +903,7 @@
       <input type="text" id="f-miel" autocomplete="off" tabindex="-1" style="position:absolute; left:-9999px" aria-hidden="true">
       <button class="principal" id="f-enviar" onclick="enviarSolicitudFondo()" style="margin-top:1rem">📨 Enviar mi solicitud</button>
       <p id="f-aviso" style="font-size:0.88rem; color:var(--rojo); margin-top:0.5rem"></p>
-      <p style="font-size:0.82rem; color:var(--texto-suave); margin-top:0.6rem">🔒 Tu solicitud viaja directo al correo de la Fundación Berit. No se guarda en ninguna base de datos ni se comparte con nadie.</p>
+      <p style="font-size:0.82rem; color:var(--texto-suave); margin-top:0.6rem">🔒 Tu solicitud incluye un resumen de las deudas y el presupuesto que anotaste en la app (así podemos evaluar tu caso) y viaja directo al correo de la Fundación Berit. No se guarda en ninguna base de datos ni se comparte con nadie.</p>
     </div>
 
     <div class="tarjeta" id="fondo-gracias" style="display:none; border-color:#86efac">
@@ -940,6 +951,7 @@ function irA(nombre) {
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('activo'));
   const botonNav = document.getElementById('nav-' + nombre); // hay pantallas sin pestaña (ej: fondo)
   if (botonNav) botonNav.classList.add('activo');
+  if (nombre === 'fondo') actualizarFondo();
   window.scrollTo({ top: 0 });
 }
 
@@ -1694,6 +1706,36 @@ function recuperarRespaldo(input) {
 }
 
 /* ================= Fondo Solidario ================= */
+// Requisito para aplicar: deudas anotadas en el Plan y presupuesto armado.
+function actualizarFondo() {
+  const gracias = document.getElementById("fondo-gracias").style.display !== "none";
+  const tienePlan = deudas.length > 0;
+  const tienePresupuesto = !!presupuesto.ingreso;
+  const completo = tienePlan && tienePresupuesto;
+  document.getElementById("req-plan-icono").textContent = tienePlan ? "✅" : "⬜";
+  document.getElementById("req-presupuesto-icono").textContent = tienePresupuesto ? "✅" : "⬜";
+  document.getElementById("req-plan-boton").style.display = tienePlan ? "none" : "";
+  document.getElementById("req-presupuesto-boton").style.display = tienePresupuesto ? "none" : "";
+  document.getElementById("fondo-requisitos").style.display = completo || gracias ? "none" : "";
+  document.getElementById("fondo-formulario").style.display = completo && !gracias ? "" : "none";
+}
+
+// Resumen de lo anotado en la app, para poder evaluar el caso (va en el correo)
+function resumenFinanzas() {
+  const totalSaldo = deudas.reduce((s, d) => s + d.saldo, 0);
+  const totalCuotas = deudas.reduce((s, d) => s + d.cuota, 0);
+  const lineas = [
+    "Ingreso mensual: " + (presupuesto.ingreso ? dinero(presupuesto.ingreso) : "(sin dato)"),
+    "Diezmos/ofrendas en su presupuesto: " + (presupuesto.diezmoActivo ? "sí (" + presupuesto.pct.diezmo + "%)" : "no"),
+    "Presupuesto: " + CATEGORIAS.map((c) => c.nombre + " " + (presupuesto.pct[c.clave] || 0) + "%").join(" · "),
+    "Deudas anotadas (" + deudas.length + "): total " + dinero(totalSaldo) + ", cuotas " + dinero(totalCuotas) + "/mes",
+  ];
+  deudas.forEach((d) => {
+    lineas.push("- " + d.nombre + ": debe " + dinero(d.saldo) + ", cuota " + dinero(d.cuota) + ", interés " + d.tasa + "%" + (d.tipo === "fija" ? " (préstamo a " + d.cuotasPlan + " cuotas)" : " (rotativa)"));
+  });
+  return lineas.join("\n").slice(0, 2400);
+}
+
 async function enviarSolicitudFondo() {
   const aviso = document.getElementById("f-aviso");
   const boton = document.getElementById("f-enviar");
@@ -1703,8 +1745,13 @@ async function enviarSolicitudFondo() {
     ciudad: document.getElementById("f-ciudad").value.trim(),
     monto: document.getElementById("f-monto").value.trim(),
     situacion: document.getElementById("f-situacion").value.trim(),
+    finanzas: resumenFinanzas(),
     miel: document.getElementById("f-miel").value, // campo trampa para robots
   };
+  if (deudas.length === 0 || !presupuesto.ingreso) {
+    actualizarFondo(); // el requisito dejó de cumplirse (p. ej. borró sus deudas)
+    return;
+  }
   if (!campos.nombre || !campos.whatsapp || !campos.situacion) {
     aviso.textContent = "Para poder ayudarte necesitamos al menos tu nombre, tu WhatsApp y que nos cuentes tu situación.";
     return;

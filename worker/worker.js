@@ -84,7 +84,7 @@ function cabecerasCors(origen) {
 // Necesita dos secretos (wrangler secret put ...):
 //   RESEND_API_KEY      clave de la cuenta gratuita de resend.com
 //   FONDO_EMAIL_DESTINO correo donde Carla recibe las solicitudes
-const LIMITES_FONDO = { nombre: 100, whatsapp: 30, ciudad: 80, monto: 40, situacion: 1500 };
+const LIMITES_FONDO = { nombre: 100, whatsapp: 30, ciudad: 80, monto: 40, situacion: 1500, finanzas: 2500 };
 
 async function manejarFondo(cuerpo, env, cors) {
   // Campo trampa: los robots lo llenan, las personas no lo ven.
@@ -122,6 +122,9 @@ async function manejarFondo(cuerpo, env, cors) {
     "",
     "Situación:",
     campos.situacion,
+    "",
+    "Finanzas organizadas en la app:",
+    campos.finanzas || "(sin resumen)",
   ];
 
   const respuestaEmail = await fetch("https://api.resend.com/emails", {
