@@ -500,7 +500,7 @@
     <button class="tarjeta-boton" onclick="irA('dinero')">
       <span class="emoji">💰</span>
       <strong>Quiero organizar mi plata</strong>
-      <span class="desc">Reparte tu ingreso entre vivir, deudas, ahorro y gustos, y míralo en un pastel. Con sugerencia según tus deudas.</span>
+      <span class="desc">Reparte tu ingreso entre vivir, deudas, ahorro y gustos, y míralo en un pastel. La inteligencia artificial te lo arma si quieres.</span>
     </button>
 
     <button class="tarjeta-boton" onclick="irA('chat')">
@@ -691,6 +691,13 @@
         <button onclick="aplicarPreset('equilibrado')"><strong>🧘 Sin deudas</strong>50 / 30 / 20</button>
         <button onclick="aplicarPreset('saliendo')"><strong>🧗 Saliendo de deudas</strong>Deudas 25%</button>
       </div>
+
+      <h3 style="margin-top:1rem">🤖 O deja que la inteligencia artificial lo arme contigo</h3>
+      <label for="ia-situacion">Cuéntale tu situación con tus palabras
+        <small>La IA usa tu ingreso y las deudas de tu Plan 🧗, más lo que escribas aquí. Necesita internet.</small>
+      </label>
+      <textarea id="ia-situacion" maxlength="400" style="min-height:70px" placeholder="Ej: pago $120 de arriendo, tengo 2 hijos en escuela, mi ingreso varía según el mes…"></textarea>
+      <button class="principal" id="ia-boton" onclick="presupuestoConIA()" style="margin-top:0.6rem">🤖 Armar mi presupuesto con IA</button>
 
       <h3>Ajusta a tu gusto</h3>
       <div class="control-pct" id="p-controles"></div>
@@ -1517,6 +1524,62 @@ function sugerirDistribucion() {
   }
 }
 
+/*
+ * Presupuesto con IA: manda ingreso, deudas del Plan y la situación escrita
+ * al worker, que devuelve porcentajes + explicación. Nada se guarda fuera.
+ */
+async function presupuestoConIA() {
+  const feedback = document.getElementById("p-feedback");
+  if (!presupuesto.ingreso) {
+    document.getElementById("p-ingreso").focus();
+    feedback.innerHTML =
+      '<div class="veredicto amarillo"><span class="titulo">Primero tu ingreso</span>Pon arriba cuánto te ingresa al mes y vuelve a tocar el botón de la IA.</div>';
+    return;
+  }
+  const boton = document.getElementById("ia-boton");
+  boton.disabled = true;
+  boton.textContent = "🤖 Pensando en tu reparto…";
+  try {
+    const respuesta = await fetch(CHAT_API_URL + "/presupuesto", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ingreso: presupuesto.ingreso,
+        diezmoActivo: presupuesto.diezmoActivo,
+        cuotas: cuotasDelPlan(),
+        deudas: deudas.map((d) => d.nombre + ": debe $" + d.saldo + ", cuota $" + d.cuota + ", interés " + d.tasa + "%").join("; ").slice(0, 1200),
+        situacion: document.getElementById("ia-situacion").value.trim().slice(0, 400),
+      }),
+    });
+    const datos = await respuesta.json();
+    const pct = datos && datos.pct;
+    const claves = ["diezmo", "vida", "deudas", "ahorro", "gustos"];
+    const valido = pct && claves.every((k) => typeof pct[k] === "number" && pct[k] >= 0 && pct[k] <= 100);
+    if (!valido) {
+      feedback.innerHTML =
+        '<div class="veredicto amarillo"><span class="titulo">No salió esta vez</span>' +
+        escaparHtml((datos && datos.texto) || "La IA no pudo armar el reparto. Intenta de nuevo, o usa \"Sugerido para mí\".") + "</div>";
+      return;
+    }
+    // Cuadrar: enteros, respetar el diezmo apagado, y que sume exactamente 100
+    claves.forEach((k) => { pct[k] = Math.round(pct[k]); });
+    if (!presupuesto.diezmoActivo && pct.diezmo > 0) { pct.vida += pct.diezmo; pct.diezmo = 0; }
+    const suma = claves.reduce((s, k) => s + pct[k], 0);
+    pct.vida += 100 - suma;
+    presupuesto.pct = pct;
+    pintarPresupuesto();
+    const extra = document.createElement("div");
+    extra.className = "veredicto verde";
+    extra.innerHTML = '<span class="titulo">🤖 Listo, la IA te propone este reparto</span>' + escaparHtml(datos.explicacion || "") + " Si algo no te cuadra, ajusta los deslizadores: tú mandas.";
+    feedback.prepend(extra);
+  } catch (e) {
+    feedback.innerHTML =
+      '<div class="veredicto amarillo"><span class="titulo">Sin conexión</span>Para armar el presupuesto con IA necesitas internet. Mientras tanto, "Sugerido para mí" funciona sin conexión.</div>';
+  }
+  boton.disabled = false;
+  boton.textContent = "🤖 Armar mi presupuesto con IA";
+}
+
 // Al mover un deslizador, los demás se reparten lo que queda (siempre suma 100)
 function moverPct(clave, valor) {
   valor = Math.min(100, Math.max(0, parseInt(valor) || 0));
@@ -1650,7 +1713,7 @@ async function compartirPagina() {
   const boton = document.getElementById("boton-compartir");
   const datos = {
     title: "Libre de Deudas",
-    text: "Herramientas gratis para salir de deudas y manejar tu plata. Antes de comprar a cuotas, ¡calcula cuánto pagarás en verdad!",
+    text: "Te ayudamos a salir de deudas, gratis y con inteligencia artificial. Antes de comprar a cuotas, ¡calcula cuánto pagarás en verdad!",
     url: "https://carla-scribano.github.io/cuentas-claras/",
   };
   try {

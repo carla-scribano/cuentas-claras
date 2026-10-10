@@ -84,6 +84,74 @@ function cabecerasCors(origen) {
   };
 }
 
+// ----- Presupuesto con IA: propone el reparto del ingreso en porcentajes -----
+const SISTEMA_PRESUPUESTO = `Eres la asesora de presupuesto de Libre de Deudas, una página ecuatoriana gratuita de educación financiera. Recibes el ingreso mensual en dólares de una persona, sus deudas y su situación, y propones cómo repartir su ingreso.
+Reglas estrictas:
+- Respondes SOLO un objeto JSON válido, sin ningún texto antes ni después y sin marcas de código, con esta forma exacta: {"pct":{"diezmo":0,"vida":55,"deudas":25,"ahorro":10,"gustos":10},"explicacion":"..."}
+- Los cinco porcentajes son enteros entre 0 y 100 y suman exactamente 100.
+- "diezmo": si la persona lo tiene activado, alrededor de 10 salvo que su situación pida otra cosa; si NO lo tiene activado, siempre 0 (no lo sugieras).
+- "deudas" debe cubrir al menos las cuotas mínimas que te indican, con algún punto extra para adelantar pagos, siempre que el ingreso lo permita. Si las cuotas superan el 70% del ingreso, prioriza techo y comida en "vida" y di en la explicación que conviene renegociar las deudas.
+- "explicacion": máximo 3 frases, en español sencillo de Ecuador y en dólares, cálida y concreta: por qué ese reparto y un consejo accionable según lo que la persona contó. Debe ser 100% coherente con los porcentajes que propones (si "ahorro" es 0, no hables de ahorrar; los montos en dólares deben salir de esos mismos porcentajes). Nunca menciones marcas, bancos ni empresas. Nunca uses las palabras "juzgar" ni "juicio". Si detectas desesperación o crisis emocional, incluye la línea gratuita de apoyo del Ecuador: 171 opción 6.`;
+
+const LIMITES_PRESUPUESTO = { deudas: 1200, situacion: 400 };
+
+async function manejarPresupuestoIA(cuerpo, env, cors) {
+  const ingreso = Number(cuerpo.ingreso);
+  const cuotas = Number(cuerpo.cuotas) || 0;
+  const deudasTexto = typeof cuerpo.deudas === "string" ? cuerpo.deudas.slice(0, LIMITES_PRESUPUESTO.deudas) : "";
+  const situacion = typeof cuerpo.situacion === "string" ? cuerpo.situacion.slice(0, LIMITES_PRESUPUESTO.situacion) : "";
+  if (!ingreso || ingreso <= 0 || ingreso > 1000000) {
+    return Response.json({ error: "Faltan datos" }, { status: 400, headers: cors });
+  }
+
+  const mensaje = [
+    "Ingreso mensual: $" + ingreso,
+    "Diezmos/ofrendas activados: " + (cuerpo.diezmoActivo ? "sí" : "no"),
+    "Suma de cuotas mínimas de sus deudas: $" + cuotas,
+    "Deudas: " + (deudasTexto || "(no anotó deudas)"),
+    "Lo que la persona cuenta de su situación: " + (situacion || "(no escribió nada)"),
+  ].join("\n");
+
+  const respuestaApi = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": env.ANTHROPIC_API_KEY,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: MODELO,
+      max_tokens: 400,
+      system: SISTEMA_PRESUPUESTO,
+      messages: [{ role: "user", content: mensaje }],
+    }),
+  });
+
+  if (!respuestaApi.ok) {
+    const texto =
+      respuestaApi.status === 429
+        ? "Hay muchas personas usando la IA en este momento. Intenta de nuevo en un minutito. 🙏"
+        : "La IA no pudo responder ahora mismo. Intenta de nuevo, o usa el botón \"Sugerido para mí\".";
+    return Response.json({ error: "api_error", texto }, { headers: cors });
+  }
+
+  const datos = await respuestaApi.json();
+  const bloqueTexto = (datos.content || []).find((b) => b.type === "text");
+  let propuesta = null;
+  try {
+    // Por si el modelo envuelve el JSON en marcas de código pese a la instrucción
+    const limpio = (bloqueTexto ? bloqueTexto.text : "").replace(/^[^{]*/, "").replace(/[^}]*$/, "");
+    propuesta = JSON.parse(limpio);
+  } catch (e) {}
+  if (!propuesta || !propuesta.pct) {
+    return Response.json(
+      { error: "formato", texto: "La IA no pudo armar el reparto esta vez. Intenta de nuevo, o usa \"Sugerido para mí\"." },
+      { headers: cors },
+    );
+  }
+  return Response.json({ pct: propuesta.pct, explicacion: String(propuesta.explicacion || "").slice(0, 600) }, { headers: cors });
+}
+
 // ----- Fondo Solidario: recibe la solicitud y la reenvía al correo de Carla -----
 // Necesita dos secretos (wrangler secret put ...):
 //   RESEND_API_KEY      clave de la cuenta gratuita de resend.com
@@ -177,8 +245,12 @@ export default {
       return Response.json({ error: "JSON inválido" }, { status: 400, headers: cors });
     }
 
-    if (new URL(request.url).pathname === "/fondo") {
+    const ruta = new URL(request.url).pathname;
+    if (ruta === "/fondo") {
       return manejarFondo(cuerpo, env, cors);
+    }
+    if (ruta === "/presupuesto") {
+      return manejarPresupuestoIA(cuerpo, env, cors);
     }
 
     const persona = PERSONAS[cuerpo.persona];
