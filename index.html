@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Herramientas gratuitas para entender tus deudas, calcular el costo real de comprar a cuotas y armar tu plan para salir de deudas. Hecho para Ecuador y Latinoamérica.">
 <title>Libre de Deudas — Entiende tus deudas y sal adelante</title>
+<meta name="theme-color" content="#0f766e">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <style>
   :root {
     --verde: #0f766e;
@@ -1561,6 +1564,11 @@ async function compartirPagina() {
 }
 
 pintarDonaciones();
+
+/* ===== Modo app (PWA): permite instalar la página y usarla sin internet ===== */
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
 
 /* ================= Chat: Clarita y el Doctor Justo ================= */
 

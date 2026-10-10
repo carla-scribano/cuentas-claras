@@ -1,0 +1,16 @@
+{
+  "name": "Libre de Deudas",
+  "short_name": "Libre de Deudas",
+  "description": "Herramientas gratuitas para entender tus deudas, calcular el costo real de comprar a cuotas y armar tu plan para salir de deudas.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fffbf5",
+  "theme_color": "#0f766e",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
