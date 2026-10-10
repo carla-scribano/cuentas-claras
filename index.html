@@ -517,6 +517,15 @@
       <p id="donacion-pronto" style="font-size:0.82rem; color:var(--texto-suave); margin-top:0.4rem">Muy pronto habilitaremos una forma segura de aportar.</p>
     </div>
 
+    <div class="tarjeta">
+      <h3 style="margin-top:0">💾 Guarda tu avance</h3>
+      <p style="font-size:0.92rem">Tus deudas y tu presupuesto viven solo en este teléfono: nadie más los ve. Pero si cambias de celular o se borra el navegador, se pierden. Guarda un respaldo de vez en cuando y recupéralo cuando lo necesites.</p>
+      <button class="secundario" onclick="guardarRespaldo()">💾 Guardar mi respaldo</button>
+      <button class="secundario" onclick="document.getElementById('archivo-respaldo').click()">📂 Recuperar un respaldo</button>
+      <input type="file" id="archivo-respaldo" accept=".json,application/json" style="display:none" onchange="recuperarRespaldo(this)">
+      <p id="respaldo-aviso" style="font-size:0.82rem; color:var(--texto-suave); margin-top:0.4rem"></p>
+    </div>
+
     <div class="nota-apoyo">
       <strong>Si tus deudas te tienen sin dormir:</strong> respira. Una deuda tiene salida, siempre. No eres mala persona por deber plata: es un problema de números, y los números se arreglan con un plan. Si sientes que ya no puedes más, habla con alguien de confianza o busca apoyo emocional gratuito (en Ecuador: línea 171 opción 6, o el 911 en una emergencia).
     </div>
@@ -1564,6 +1573,60 @@ async function compartirPagina() {
 }
 
 pintarDonaciones();
+
+/* ================= Respaldo: guardar y recuperar el avance sin crear cuenta ================= */
+function guardarRespaldo() {
+  const datos = {
+    app: "libre-de-deudas",
+    version: 1,
+    fecha: new Date().toISOString().slice(0, 10),
+    deudas: deudas,
+    presupuesto: presupuesto,
+  };
+  const nombre = `respaldo-libre-de-deudas-${datos.fecha}.json`;
+  const archivo = new File([JSON.stringify(datos, null, 2)], nombre, { type: "application/json" });
+  const aviso = document.getElementById("respaldo-aviso");
+  // En celulares se abre la hoja de compartir: lo más fácil es enviárselo al propio WhatsApp
+  if (navigator.canShare && navigator.canShare({ files: [archivo] })) {
+    navigator.share({ files: [archivo], title: "Mi respaldo de Libre de Deudas" })
+      .then(() => { aviso.textContent = "✅ Listo. Un buen lugar para guardarlo: envíatelo por WhatsApp a tu propio número."; })
+      .catch(() => { /* la persona canceló: no pasa nada */ });
+    return;
+  }
+  const enlace = document.createElement("a");
+  enlace.href = URL.createObjectURL(archivo);
+  enlace.download = nombre;
+  enlace.click();
+  URL.revokeObjectURL(enlace.href);
+  aviso.textContent = "✅ Respaldo descargado. Guárdalo donde no se pierda.";
+}
+
+function recuperarRespaldo(input) {
+  const archivo = input.files && input.files[0];
+  input.value = "";
+  if (!archivo) return;
+  const lector = new FileReader();
+  lector.onload = () => {
+    let datos = null;
+    try { datos = JSON.parse(lector.result); } catch (e) {}
+    const valido = datos && datos.app === "libre-de-deudas" && Array.isArray(datos.deudas) && datos.presupuesto && datos.presupuesto.pct;
+    if (!valido) {
+      alert("Ese archivo no parece un respaldo de esta página. Busca el que empieza con 'respaldo-libre-de-deudas'.");
+      return;
+    }
+    const hayDatos = deudas.length > 0 || presupuesto.ingreso;
+    if (hayDatos && !confirm("Esto reemplaza las deudas y el presupuesto que tienes ahora en este teléfono por los del respaldo. ¿Continuar?")) return;
+    try {
+      localStorage.setItem("cuentasClarasDeudas", JSON.stringify(datos.deudas));
+      localStorage.setItem("cuentasClarasPresupuesto", JSON.stringify(datos.presupuesto));
+    } catch (e) {
+      alert("No se pudo guardar el respaldo en este teléfono.");
+      return;
+    }
+    location.reload();
+  };
+  lector.readAsText(archivo);
+}
 
 /* ===== Modo app (PWA): permite instalar la página y usarla sin internet ===== */
 if ("serviceWorker" in navigator) {
