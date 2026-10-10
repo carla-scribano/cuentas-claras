@@ -29,6 +29,7 @@ Reglas generales que SIEMPRE cumples:
 - En Ecuador la moneda es el dólar estadounidense. SIEMPRE habla de dólares; nunca de pesos ni de otras monedas.
 - Respuestas CORTAS: máximo 3 párrafos breves o una lista de hasta 5 puntos. La persona probablemente lee desde un celular sencillo.
 - Tono cálido y sin juzgar. Nunca haces sentir mal a nadie por sus deudas: "deber plata no te hace mala persona".
+- PROHIBIDO usar en tus respuestas las palabras "juzgar", "juzgo", "juzgarte", "juzgamos" o "juicio" en cualquier forma ("sin juzgar", "no te juzgo", "nadie te juzga", etc.). Nombrar el juicio lo invoca: el tono acogedor se demuestra con calidez, jamás se anuncia.
 - Nunca recomiendas ni mencionas marcas, bancos, cooperativas o empresas específicas. Hablas en general ("un banco", "una cooperativa", "una financiera").
 - Si detectas desesperación, ideas de hacerse daño o crisis emocional, tu PRIMERA prioridad es la persona: respondes con calidez, le recuerdas que las deudas tienen salida y que no está sola, y le das la línea gratuita de apoyo emocional del Ecuador: 171 opción 6, o el 911 si es una emergencia. Esto va antes que cualquier consejo financiero o legal.
 - Si la pregunta se sale de tu tema (no es de plata, deudas o asuntos legales relacionados), lo dices con simpatía y rediriges a lo tuyo.
@@ -79,6 +80,73 @@ function cabecerasCors(origen) {
   };
 }
 
+// ----- Fondo Solidario: recibe la solicitud y la reenvía al correo de Carla -----
+// Necesita dos secretos (wrangler secret put ...):
+//   RESEND_API_KEY      clave de la cuenta gratuita de resend.com
+//   FONDO_EMAIL_DESTINO correo donde Carla recibe las solicitudes
+const LIMITES_FONDO = { nombre: 100, whatsapp: 30, ciudad: 80, monto: 40, situacion: 1500 };
+
+async function manejarFondo(cuerpo, env, cors) {
+  // Campo trampa: los robots lo llenan, las personas no lo ven.
+  // Se responde "ok" para no darle pistas al robot.
+  if (cuerpo.miel) {
+    return Response.json({ ok: true }, { headers: cors });
+  }
+
+  const campos = {};
+  for (const clave of Object.keys(LIMITES_FONDO)) {
+    const valor = typeof cuerpo[clave] === "string" ? cuerpo[clave].trim() : "";
+    if (valor.length > LIMITES_FONDO[clave]) {
+      return Response.json({ error: "Campo demasiado largo" }, { status: 400, headers: cors });
+    }
+    campos[clave] = valor;
+  }
+  if (!campos.nombre || !campos.whatsapp || !campos.situacion) {
+    return Response.json({ error: "Faltan datos" }, { status: 400, headers: cors });
+  }
+
+  if (!env.RESEND_API_KEY || !env.FONDO_EMAIL_DESTINO) {
+    return Response.json(
+      { error: "fondo_no_configurado", texto: "El fondo todavía no está recibiendo solicitudes por aquí. Intenta de nuevo en unos días. 🙏" },
+      { headers: cors },
+    );
+  }
+
+  const lineas = [
+    "Nueva solicitud al Fondo Solidario",
+    "",
+    "Nombre: " + campos.nombre,
+    "WhatsApp: " + campos.whatsapp,
+    "Ciudad/provincia: " + (campos.ciudad || "(no indicada)"),
+    "Deuda total aproximada: " + (campos.monto || "(no indicada)"),
+    "",
+    "Situación:",
+    campos.situacion,
+  ];
+
+  const respuestaEmail = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + env.RESEND_API_KEY,
+    },
+    body: JSON.stringify({
+      from: "Libre de Deudas <onboarding@resend.dev>",
+      to: [env.FONDO_EMAIL_DESTINO],
+      subject: "Fondo Solidario: solicitud de " + campos.nombre,
+      text: lineas.join("\n"),
+    }),
+  });
+
+  if (!respuestaEmail.ok) {
+    return Response.json(
+      { error: "email_error", texto: "No se pudo enviar tu solicitud ahora mismo. Intenta de nuevo en un rato." },
+      { headers: cors },
+    );
+  }
+  return Response.json({ ok: true }, { headers: cors });
+}
+
 export default {
   async fetch(request, env) {
     const origen = request.headers.get("Origin") || "";
@@ -100,6 +168,10 @@ export default {
       cuerpo = await request.json();
     } catch (e) {
       return Response.json({ error: "JSON inválido" }, { status: 400, headers: cors });
+    }
+
+    if (new URL(request.url).pathname === "/fondo") {
+      return manejarFondo(cuerpo, env, cors);
     }
 
     const persona = PERSONAS[cuerpo.persona];

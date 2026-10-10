@@ -7,7 +7,8 @@ Renombrado de "Cuentas Claras" a "Libre de Deudas" en octubre 2026 (ya existía 
 ## Arquitectura
 
 - `index.html` — TODA la página en un solo archivo, sin frameworks ni build. Decisión deliberada: público con Android de gama baja y datos limitados. No introducir dependencias ni separar archivos sin hablarlo con Carla.
-- `worker/worker.js` — Cloudflare Worker del chat (fuente de verdad; desplegado en `https://cuentas-claras-chat.carla-844.workers.dev`). Guarda los prompts de los dos personajes del chat y la clave de Anthropic como secreto `ANTHROPIC_API_KEY`.
+- `worker/worker.js` — Cloudflare Worker (fuente de verdad; desplegado en `https://cuentas-claras-chat.carla-844.workers.dev`). Dos rutas: `POST /` es el chat (prompts de los dos personajes; secreto `ANTHROPIC_API_KEY`) y `POST /fondo` recibe la solicitud del Fondo Solidario y la reenvía por email vía Resend. El fondo necesita dos secretos (`npx wrangler secret put ...`): `RESEND_API_KEY` (cuenta gratuita de resend.com de Carla) y `FONDO_EMAIL_DESTINO` (correo donde recibe solicitudes); sin ellos la ruta responde un mensaje amable de "aún no disponible". Nada de la solicitud se guarda: solo viaja al email.
+- PWA: `manifest.json`, `sw.js` (red primero, caché de respaldo) e `icon-192/512.png` (sol amaneciendo). Rutas relativas por el subdirectorio de GitHub Pages. Si cambia `index.html` no hay que tocar nada del service worker.
 - Modelo del chat: `claude-haiku-4-5` (prioridad: costo mínimo, pedido explícito de Carla).
 
 ## Cómo desplegar
@@ -23,6 +24,8 @@ Renombrado de "Cuentas Claras" a "Libre de Deudas" en octubre 2026 (ya existía 
 - No recomendar marcas, bancos ni empresas específicas.
 - Protocolo de crisis en todo contenido sensible: línea 171 opción 6 (apoyo emocional MSP) y 911.
 - Diezmos y ofrendas: existe como categoría **opcional** del presupuesto (Carla es creyente); ahí sí lenguaje de fe explícito porque es opt-in. El chat de Clarita aplica principios bíblicos de finanzas pero en lenguaje secular.
+- La página del Fondo Solidario usa tono "fe honesta, sin presión" (decidido por Carla): nombra la fe como origen del fondo, pero deja claro que la ayuda no tiene condiciones religiosas.
+- La regla de no nombrar el juicio también vive en el prompt del worker (prohibido "juzgar"/"juicio" en las respuestas del chat).
 
 ## Datos de los usuarios
 

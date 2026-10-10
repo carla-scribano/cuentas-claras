@@ -86,7 +86,7 @@
   /* ---------- Formularios ---------- */
   label { display: block; font-weight: 600; font-size: 0.92rem; margin: 0.9rem 0 0.25rem; }
   label small { font-weight: 400; color: var(--texto-suave); display: block; }
-  input[type="number"], input[type="text"], select {
+  input[type="number"], input[type="text"], input[type="tel"], textarea, select {
     width: 100%;
     font-size: 1.15rem;
     padding: 0.65rem 0.7rem;
@@ -95,7 +95,8 @@
     background: white;
     color: var(--texto);
   }
-  input:focus, select:focus { outline: 2px solid var(--verde); border-color: var(--verde); }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--verde); border-color: var(--verde); }
+  textarea { resize: vertical; min-height: 110px; font-family: inherit; }
   .fila { display: flex; gap: 0.7rem; }
   .fila > div { flex: 1; }
 
@@ -507,6 +508,12 @@
       <span class="desc">Pregúntale a Clarita (finanzas) o al Doctor Justo (temas legales). Gratis y sin registrarte.</span>
     </button>
 
+    <button class="tarjeta-boton" onclick="irA('fondo')">
+      <span class="emoji">🤝</span>
+      <strong>La deuda me está ahogando</strong>
+      <span class="desc">Conoce el Fondo Solidario: préstamos pequeños con interés bajito para salir de una deuda cara. Cupos muy limitados.</span>
+    </button>
+
     <div class="tarjeta" style="border-color:#86efac">
       <h3 style="margin-top:0">💚 ¿Te sirvió Libre de Deudas?</h3>
       <p style="font-size:0.92rem">Este proyecto es gratuito y sin fines de lucro: no vendemos nada, no hay publicidad y no pedimos tus datos. Si quieres que siga creciendo y ayudando a más personas a salir de deudas, hay dos formas de apoyar:</p>
@@ -841,6 +848,61 @@
     </div>
   </section>
 
+  <!-- ============ FONDO SOLIDARIO ============ -->
+  <section id="pantalla-fondo" class="pantalla">
+    <button class="secundario" onclick="irA('inicio')" style="margin-bottom:0.8rem">← Volver al inicio</button>
+    <h2>🤝 Fondo Solidario</h2>
+    <p class="intro">Un empujón para salir del apuro, de gente que cree en las segundas oportunidades.</p>
+
+    <div class="tarjeta">
+      <h3 style="margin-top:0">¿Qué es?</h3>
+      <p style="font-size:0.95rem">Es un fondo pequeño, donado por la fundadora de esta página, que presta montos chicos con un interés bajito a personas que están ahogadas por una deuda cara (como el chulco o una tarjeta desbordada). No es un negocio: lo que devuelves sirve para ayudar a la siguiente persona. Así de simple.</p>
+      <p style="font-size:0.95rem; margin-top:0.5rem">Y te lo decimos de frente: este fondo nace de la fe. Creemos en la generosidad que Dios enseña, en ayudar sin aprovecharse del que está apurado, y en que todos merecemos volver a empezar. Pero la ayuda no tiene condiciones religiosas: no te pedimos ser creyente, ni ir a ninguna iglesia, ni nada a cambio. Es para ti, seas quien seas.</p>
+    </div>
+
+    <div class="tarjeta">
+      <h3 style="margin-top:0">Lo que NO es</h3>
+      <p style="font-size:0.95rem">❌ <strong>No es chulco.</strong> Nadie te va a perseguir, amenazar ni cobrar intereses de miedo. El interés es bajito y se acuerda contigo, claro y por escrito, antes de recibir un centavo.</p>
+      <p style="font-size:0.95rem; margin-top:0.5rem">❌ <strong>No es un banco ni una app de préstamos.</strong> No revisamos tu buró, no pedimos garante ni te bloqueamos el celular. Evaluamos tu situación conversando contigo, de persona a persona.</p>
+      <p style="font-size:0.95rem; margin-top:0.5rem">❌ <strong>No es plata fácil para cualquier cosa.</strong> Es para salir de una deuda que te está asfixiando, no para una compra nueva. Y confiamos en tu palabra para devolverlo: cuando lo haces, esa plata rescata al siguiente.</p>
+    </div>
+
+    <div class="tarjeta">
+      <h3 style="margin-top:0">Cómo funciona</h3>
+      <p style="font-size:0.95rem"><strong>1.</strong> Llenas la solicitud de abajo (2 minutos).</p>
+      <p style="font-size:0.95rem"><strong>2.</strong> Si tu caso puede avanzar, te escribimos por WhatsApp para conversar con calma sobre tu situación.</p>
+      <p style="font-size:0.95rem"><strong>3.</strong> Si el fondo alcanza para tu caso, acordamos juntos el monto y un plan de pago que sí puedas cumplir.</p>
+      <p style="font-size:0.9rem; color:var(--texto-suave); margin-top:0.6rem">Hablando claro: el fondo es chiquito y los cupos son muy limitados. Aplicar no garantiza el préstamo, y puede que este mes no alcance. Si no te escribimos, puedes volver a aplicar más adelante — tu solicitud no queda guardada en ningún lado.</p>
+    </div>
+
+    <div class="tarjeta" id="fondo-formulario">
+      <h3 style="margin-top:0">📝 Solicitud</h3>
+      <label for="f-nombre">¿Cómo te llamas?</label>
+      <input type="text" id="f-nombre" maxlength="100" placeholder="Tu nombre">
+      <label for="f-whatsapp">Tu número de WhatsApp <small>Solo para responderte. No lo usamos para nada más.</small></label>
+      <input type="tel" id="f-whatsapp" maxlength="30" inputmode="tel" placeholder="Ej: 0991234567">
+      <label for="f-ciudad">¿En qué ciudad o provincia vives? <small>Opcional</small></label>
+      <input type="text" id="f-ciudad" maxlength="80" placeholder="Ej: Guayaquil">
+      <label for="f-monto">¿Cuánto debes en total, más o menos? <small>Opcional. En dólares.</small></label>
+      <input type="text" id="f-monto" maxlength="40" inputmode="decimal" placeholder="Ej: 350">
+      <label for="f-situacion">Cuéntanos tu situación <small>¿A quién le debes, cómo te está afectando, y en qué te ayudaría el fondo?</small></label>
+      <textarea id="f-situacion" maxlength="1500" placeholder="Escribe con confianza, te leemos con respeto."></textarea>
+      <input type="text" id="f-miel" autocomplete="off" tabindex="-1" style="position:absolute; left:-9999px" aria-hidden="true">
+      <button class="principal" id="f-enviar" onclick="enviarSolicitudFondo()" style="margin-top:1rem">📨 Enviar mi solicitud</button>
+      <p id="f-aviso" style="font-size:0.88rem; color:var(--rojo); margin-top:0.5rem"></p>
+      <p style="font-size:0.82rem; color:var(--texto-suave); margin-top:0.6rem">🔒 Tu solicitud viaja directo al correo de la fundadora. No se guarda en ninguna base de datos ni se comparte con nadie.</p>
+    </div>
+
+    <div class="tarjeta" id="fondo-gracias" style="display:none; border-color:#86efac">
+      <h3 style="margin-top:0">✅ ¡Tu solicitud se envió!</h3>
+      <p style="font-size:0.95rem">Gracias por confiar y contarnos tu situación. Si tu caso puede avanzar, te escribiremos por WhatsApp. Mientras tanto, el plan bola de nieve 🧗 y el presupuesto 💰 de esta página son tus mejores aliados — y son gratis para siempre.</p>
+    </div>
+
+    <div class="nota-apoyo">
+      <strong>Si la deuda te tiene al borde:</strong> respira. Esto que sientes tiene salida, y tú vales mucho más que cualquier número. Si sientes que ya no puedes más, habla hoy mismo con alguien de confianza o llama gratis a la línea de apoyo emocional del Ecuador: 171 opción 6, o el 911 en una emergencia. No estás solo ni sola.
+    </div>
+  </section>
+
 </main>
 
 <div id="modal-diezmo" class="modal-fondo" onclick="if(event.target===this) cerrarModal('modal-diezmo')">
@@ -874,7 +936,8 @@ function irA(nombre) {
   document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
   document.getElementById('pantalla-' + nombre).classList.add('activa');
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('activo'));
-  document.getElementById('nav-' + nombre).classList.add('activo');
+  const botonNav = document.getElementById('nav-' + nombre); // hay pantallas sin pestaña (ej: fondo)
+  if (botonNav) botonNav.classList.add('activo');
   window.scrollTo({ top: 0 });
 }
 
@@ -1626,6 +1689,46 @@ function recuperarRespaldo(input) {
     location.reload();
   };
   lector.readAsText(archivo);
+}
+
+/* ================= Fondo Solidario ================= */
+async function enviarSolicitudFondo() {
+  const aviso = document.getElementById("f-aviso");
+  const boton = document.getElementById("f-enviar");
+  const campos = {
+    nombre: document.getElementById("f-nombre").value.trim(),
+    whatsapp: document.getElementById("f-whatsapp").value.trim(),
+    ciudad: document.getElementById("f-ciudad").value.trim(),
+    monto: document.getElementById("f-monto").value.trim(),
+    situacion: document.getElementById("f-situacion").value.trim(),
+    miel: document.getElementById("f-miel").value, // campo trampa para robots
+  };
+  if (!campos.nombre || !campos.whatsapp || !campos.situacion) {
+    aviso.textContent = "Para poder ayudarte necesitamos al menos tu nombre, tu WhatsApp y que nos cuentes tu situación.";
+    return;
+  }
+  aviso.textContent = "";
+  boton.disabled = true;
+  boton.textContent = "Enviando…";
+  try {
+    const respuesta = await fetch(CHAT_API_URL + "/fondo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(campos),
+    });
+    const datos = await respuesta.json();
+    if (datos.ok) {
+      document.getElementById("fondo-formulario").style.display = "none";
+      document.getElementById("fondo-gracias").style.display = "";
+      document.getElementById("fondo-gracias").scrollIntoView({ block: "center" });
+    } else {
+      aviso.textContent = datos.texto || "No se pudo enviar tu solicitud. Intenta de nuevo en un rato.";
+    }
+  } catch (e) {
+    aviso.textContent = "No se pudo enviar (¿estás sin internet?). Intenta de nuevo más tarde.";
+  }
+  boton.disabled = false;
+  boton.textContent = "📨 Enviar mi solicitud";
 }
 
 /* ===== Modo app (PWA): permite instalar la página y usarla sin internet ===== */
