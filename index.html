@@ -323,11 +323,11 @@
   nav {
     position: fixed;
     bottom: 0; left: 0; right: 0;
-    background: white;
-    border-top: 1px solid var(--borde);
+    background: var(--terracota);
+    border-radius: 24px 24px 0 0;
     display: flex;
     justify-content: space-around;
-    padding: 0.35rem 0.25rem max(0.35rem, env(safe-area-inset-bottom));
+    padding: 0.4rem 0.25rem max(0.4rem, env(safe-area-inset-bottom));
     z-index: 10;
   }
   nav button {
@@ -336,7 +336,7 @@
     font: inherit;
     font-size: 0.75rem; /* 7 pestañas en 360 px: excepción al mínimo de 14 px */
     line-height: 1rem;
-    color: var(--texto-suave);
+    color: var(--tinta);
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -349,7 +349,7 @@
     max-width: 110px;
   }
   nav button .icono { font-size: 1.25rem; line-height: 1.5rem; }
-  nav button.activo { color: var(--pino); font-weight: 500; background: var(--salvia); }
+  nav button.activo { color: var(--pino); font-weight: 500; background: white; }
 
   /* ---------- Presupuesto ---------- */
   :root {
