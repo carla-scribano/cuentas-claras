@@ -11,7 +11,7 @@ Renombrado de "Cuentas Claras" a "Libre de Deudas" en octubre 2026 (ya existía 
 
 - `index.html` — TODA la página en un solo archivo, sin frameworks ni build. Decisión deliberada: público con Android de gama baja y datos limitados. No introducir dependencias ni separar archivos sin hablarlo con Carla.
 - `worker/worker.js` — Cloudflare Worker (fuente de verdad; desplegado en `https://cuentas-claras-chat.carla-844.workers.dev`). Tres rutas: `POST /` es el chat (prompts de los dos personajes; secreto `ANTHROPIC_API_KEY`), `POST /presupuesto` arma el reparto del presupuesto con IA (devuelve JSON con porcentajes + explicación; mismo modelo y clave) y `POST /fondo` recibe la solicitud del Fondo Solidario y la reenvía por email vía Resend. El fondo necesita dos secretos (`npx wrangler secret put ...`): `RESEND_API_KEY` (cuenta gratuita de resend.com de Carla) y `FONDO_EMAIL_DESTINO` (correo donde recibe solicitudes); Ambos están configurados (octubre 2026) y el envío está probado; sin ellos la ruta respondería un mensaje amable de "aún no disponible". Nada de la solicitud se guarda: solo viaja al email.
-- PWA: `manifest.json`, `sw.js` (red primero, caché de respaldo) e `icon-192/512.png` (sol amaneciendo). Rutas relativas por el subdirectorio de GitHub Pages. Si cambia `index.html` no hay que tocar nada del service worker.
+- PWA: `manifest.json`, `sw.js` (red primero, caché de respaldo) e `icon-192/512.png` (sol del manual de marca sobre salvia). Rutas relativas por el subdirectorio de GitHub Pages. Si cambia `index.html` no hay que tocar nada del service worker.
 - Modelo del chat: `claude-haiku-4-5` (prioridad: costo mínimo, pedido explícito de Carla).
 
 ## Cómo desplegar
@@ -38,6 +38,15 @@ Todo vive en localStorage del teléfono del usuario (deudas, presupuesto). Sin b
 
 - Probar los flujos en el navegador (preview `cuentas-claras` en .claude/launch.json, puerto 8642) y limpiar localStorage de prueba.
 - Los colores de gráficos se validan para daltonismo (skill dataviz, script validate_palette). Paleta del pastel: lila #a78bfa (diezmo), índigo #4f46e5 (vida), rojo vino #be123c (deudas), teal #0d9488 (ahorro), ámbar #d97706 (gustos).
+
+## Marca (manual de marca de Fundación Berit, octubre 2026)
+
+El manual vive fuera del repo, en la carpeta privada de Carla `~/GitHub/Fundacion Berit/Brandbook/` (no subirlo al repo: es público y se publica en la web). La app ya lo aplica:
+- Paleta (variables en `:root` de index.html): pino #3E5F3A (textos destacados, botones, logo), crema #FCF8F1 (fondo), tinta #2A2622 (texto), salvia #DFE8D6, miel #F7D98B (destacados), terracota #F2CDB8 (mensajes personales y nota de apoyo), arena #F3E6D3, barro #9A4A2C (acento), sol #E8B547 (solo el sol, nunca texto). Texto suave #5a544c. Las variables viejas (`--verde`, `--verde-claro`…) apuntan a las nuevas.
+- Semáforo: peligro #B42318/#FBE4E1, cuidado #8A5A00/#FBEFC9, bien #276B43/#DCEFE2. El color nunca va solo: cada aviso lleva una forma en CSS (rombo, triángulo, círculo) además de la palabra; por eso los títulos de `.veredicto` no llevan emoji al inicio.
+- Tipografía: solo fuente del sistema. Títulos sin negrita (h2 24/30 regular, h3 20/26 medium), texto 16/24, mínimo 14 px (excepción: etiquetas de la barra inferior, 12 px, por las 7 pestañas), botones 48 px de alto en medium.
+- Logo de la cabecera e íconos de la app: sol con 5 rayos sobre el horizonte, en salvia/sol/pino. El logo está dibujado como SVG dentro de index.html; los PNG de los íconos se generan del mismo dibujo.
+- No usar fuentes externas (Source Serif/Sans son solo para redes e impresos).
 
 ## Hoja de ruta acordada (sesión de planeación, octubre 2026)
 

@@ -3,7 +3,7 @@
 // internet, y caché como respaldo para que todo funcione sin conexión.
 // Rutas relativas a propósito: la página vive en un subdirectorio de GitHub Pages.
 
-const CACHE = "libre-de-deudas-v1";
+const CACHE = "libre-de-deudas-v2";
 const ARCHIVOS = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (evento) => {

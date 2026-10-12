@@ -5,177 +5,243 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Herramientas gratuitas para entender tus deudas, calcular el costo real de comprar a cuotas y armar tu plan para salir de deudas. Hecho para Ecuador y Latinoamérica.">
 <title>Libre de Deudas — Entiende tus deudas y sal adelante</title>
-<meta name="theme-color" content="#0f766e">
+<meta name="theme-color" content="#FCF8F1">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
+  /* Paleta del manual de marca de Fundación Berit (octubre 2026) */
   :root {
-    --verde: #0f766e;
-    --verde-oscuro: #115e59;
-    --verde-claro: #ccfbf1;
-    --crema: #fffbf5;
-    --texto: #1c1917;
-    --texto-suave: #57534e;
-    --rojo: #b91c1c;
-    --rojo-claro: #fee2e2;
-    --amarillo: #a16207;
-    --amarillo-claro: #fef9c3;
-    --verde-ok: #15803d;
-    --verde-ok-claro: #dcfce7;
-    --borde: #e7e5e4;
-    --sombra: 0 1px 3px rgba(0,0,0,0.08);
+    --pino: #3E5F3A;          /* textos destacados, botones y logo */
+    --pino-oscuro: #2f4a2c;   /* botón presionado */
+    --salvia: #DFE8D6;        /* fondo de tarjetas suaves e ícono */
+    --crema: #FCF8F1;         /* fondo general */
+    --sol: #E8B547;           /* solo para el sol: nunca texto */
+    --miel: #F7D98B;          /* fondo de destacados */
+    --terracota: #F2CDB8;     /* fondo de mensajes personales */
+    --arena: #F3E6D3;         /* fondo alterno y separadores */
+    --barro: #9A4A2C;         /* acento de texto, con moderación */
+    --tinta: #2A2622;         /* textos largos */
+
+    /* Nombres que usa el resto del código */
+    --verde: var(--pino);
+    --verde-oscuro: var(--pino);
+    --verde-claro: var(--salvia);
+    --texto: var(--tinta);
+    --texto-suave: #5a544c;
+    --borde: #E4DCCE;
+
+    /* Semáforo (texto / fondo), todos con contraste AA */
+    --rojo: #B42318;     --rojo-claro: #FBE4E1;
+    --amarillo: #8A5A00; --amarillo-claro: #FBEFC9;
+    --verde-ok: #276B43; --verde-ok-claro: #DCEFE2;
+
+    --sombra: 0 1px 2px rgba(42, 38, 34, 0.06);
+    --radio: 14px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { font-size: 17px; }
+  html { font-size: 16px; -webkit-text-size-adjust: 100%; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: system-ui, -apple-system, Roboto, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     background: var(--crema);
     color: var(--texto);
-    line-height: 1.55;
-    padding-bottom: 90px; /* espacio para la barra de navegación */
+    line-height: 1.5;
+    padding-bottom: 92px; /* espacio para la barra de navegación */
   }
+  strong, b { font-weight: 600; }
 
-  /* ---------- Cabecera ---------- */
+  /* ---------- Cabecera: logo horizontal ---------- */
   header {
-    background: var(--verde);
-    color: white;
-    padding: 1.1rem 1.2rem 1rem;
-    text-align: center;
+    background: var(--crema);
+    padding: 1rem 1rem 0.4rem;
+    max-width: 640px;
+    margin: 0 auto;
   }
-  header h1 { font-size: 1.35rem; letter-spacing: 0.2px; }
-  header p { font-size: 0.85rem; opacity: 0.9; margin-top: 2px; }
+  header .logo { display: flex; align-items: center; gap: 0.6rem; font-weight: 400; }
+  header .logo-icono { width: 40px; height: 40px; flex-shrink: 0; display: block; }
+  header .logo-textos { display: flex; flex-direction: column; line-height: 1.15; }
+  header .logo-nombre { font-size: 1.25rem; font-weight: 500; color: var(--pino); letter-spacing: 0.1px; }
+  header .logo-firma { font-size: 0.875rem; color: var(--texto-suave); }
+  header .lema { font-size: 0.875rem; color: var(--texto-suave); margin-top: 0.5rem; }
 
-  main { max-width: 640px; margin: 0 auto; padding: 1rem 1rem 2rem; }
+  main { max-width: 640px; margin: 0 auto; padding: 0.4rem 1rem 2rem; }
 
   .pantalla { display: none; }
-  .pantalla.activa { display: block; animation: aparecer 0.25s ease; }
-  @keyframes aparecer { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .pantalla.activa { display: block; animation: aparecer 0.2s ease; }
+  @keyframes aparecer { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .pantalla.activa { animation: none; }
+    * { transition: none !important; }
+  }
 
-  h2 { font-size: 1.25rem; margin: 1.2rem 0 0.4rem; color: var(--verde-oscuro); }
-  h3 { font-size: 1.05rem; margin: 1rem 0 0.3rem; }
-  p.intro { color: var(--texto-suave); font-size: 0.95rem; }
+  /* Jerarquía del manual: títulos sin negrita */
+  h2 { font-size: 1.5rem; line-height: 1.875rem; font-weight: 400; margin: 1rem 0 0.4rem; color: var(--tinta); }
+  h3 { font-size: 1.25rem; line-height: 1.625rem; font-weight: 500; margin: 1rem 0 0.4rem; color: var(--tinta); }
+  p.intro { color: var(--texto-suave); font-size: 1rem; }
 
   /* ---------- Tarjetas ---------- */
   .tarjeta {
     background: white;
-    border: 1px solid var(--borde);
-    border-radius: 14px;
+    border: 1px solid transparent;
+    border-radius: var(--radio);
     padding: 1.1rem;
     margin: 0.9rem 0;
     box-shadow: var(--sombra);
   }
+  .tarjeta.destacada { background: var(--miel); box-shadow: none; }
+  .tarjeta.lograda { background: var(--verde-ok-claro); box-shadow: none; }
+  .tarjeta.alivio { background: var(--salvia); box-shadow: none; }
+
+  /* Tarjetas de inicio: cuadro de color con el ícono + título + descripción */
   .tarjeta-boton {
-    display: block;
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    column-gap: 0.85rem;
+    align-items: center;
     width: 100%;
+    min-height: 64px;
     text-align: left;
     cursor: pointer;
     font: inherit;
+    color: var(--texto);
     background: white;
-    border: 1px solid var(--borde);
-    border-radius: 14px;
-    padding: 1.1rem;
-    margin: 0.9rem 0;
+    border: 1px solid transparent;
+    border-radius: var(--radio);
+    padding: 0.8rem 0.9rem;
+    margin: 0.55rem 0;
     box-shadow: var(--sombra);
     transition: transform 0.1s ease;
   }
-  .tarjeta-boton:active { transform: scale(0.98); }
-  .tarjeta-boton .emoji { font-size: 1.7rem; display: block; margin-bottom: 0.3rem; }
-  .tarjeta-boton strong { font-size: 1.05rem; color: var(--verde-oscuro); }
-  .tarjeta-boton span.desc { display: block; color: var(--texto-suave); font-size: 0.9rem; margin-top: 2px; }
+  .tarjeta-boton:active { transform: scale(0.985); }
+  .tarjeta-boton .emoji {
+    grid-row: span 2;
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: var(--salvia);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.35rem;
+  }
+  /* Colores del manual: herramientas en salvia, presupuesto en miel, conversar en arena, fondo en terracota */
+  .tarjeta-boton[onclick*="'dinero'"] .emoji { background: var(--miel); }
+  .tarjeta-boton[onclick*="'chat'"] .emoji,
+  .tarjeta-boton[onclick*="'aprende'"] .emoji { background: var(--arena); }
+  .tarjeta-boton[onclick*="'fondo'"] .emoji { background: var(--terracota); }
+  .tarjeta-boton strong { font-size: 1rem; font-weight: 500; color: var(--tinta); align-self: end; }
+  .tarjeta-boton span.desc { display: block; color: var(--texto-suave); font-size: 0.875rem; line-height: 1.25rem; margin-top: 1px; align-self: start; }
 
   /* ---------- Formularios ---------- */
-  label { display: block; font-weight: 600; font-size: 0.92rem; margin: 0.9rem 0 0.25rem; }
-  label small { font-weight: 400; color: var(--texto-suave); display: block; }
+  label { display: block; font-weight: 500; font-size: 1rem; margin: 1rem 0 0.3rem; color: var(--tinta); }
+  label small { font-weight: 400; font-size: 0.875rem; color: var(--texto-suave); display: block; }
   input[type="number"], input[type="text"], input[type="tel"], textarea, select {
     width: 100%;
-    font-size: 1.15rem;
-    padding: 0.65rem 0.7rem;
+    min-height: 48px;
+    font: inherit;
+    font-size: 1.125rem;
+    padding: 0.6rem 0.75rem;
     border: 1.5px solid var(--borde);
-    border-radius: 10px;
+    border-radius: 12px;
     background: white;
     color: var(--texto);
   }
-  input:focus, textarea:focus, select:focus { outline: 2px solid var(--verde); border-color: var(--verde); }
-  textarea { resize: vertical; min-height: 110px; font-family: inherit; }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--pino); outline-offset: 1px; border-color: var(--pino); }
+  textarea { resize: vertical; min-height: 110px; font-size: 1rem; line-height: 1.5; }
   .fila { display: flex; gap: 0.7rem; }
   .fila > div { flex: 1; }
 
   button.principal {
     display: block;
     width: 100%;
-    background: var(--verde);
+    min-height: 48px;
+    background: var(--pino);
     color: white;
     font: inherit;
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.25rem;
+    font-weight: 500;
     border: none;
     border-radius: 12px;
-    padding: 0.9rem;
+    padding: 0.85rem 1rem;
     margin-top: 1.2rem;
     cursor: pointer;
   }
-  button.principal:active { background: var(--verde-oscuro); }
+  button.principal:active { background: var(--pino-oscuro); }
+  button.principal:disabled { opacity: 0.6; cursor: default; }
   button.secundario {
     display: inline-block;
+    min-height: 44px;
     background: white;
-    color: var(--verde-oscuro);
+    color: var(--pino);
     font: inherit;
-    font-size: 0.95rem;
-    font-weight: 600;
-    border: 1.5px solid var(--verde);
-    border-radius: 10px;
-    padding: 0.5rem 0.9rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border: 1.5px solid var(--pino);
+    border-radius: 12px;
+    padding: 0.55rem 1rem;
     margin-top: 0.6rem;
     cursor: pointer;
   }
+  button.secundario:active { background: var(--salvia); }
+  button:focus-visible, .tarjeta-boton:focus-visible, summary:focus-visible { outline: 2px solid var(--pino); outline-offset: 2px; }
 
   /* ---------- Resultados ---------- */
   .resultado { display: none; }
   .resultado.visible { display: block; }
   .veredicto {
-    border-radius: 14px;
-    padding: 1.1rem;
+    border-radius: 18px;
+    padding: 1rem 1.1rem;
     margin: 1rem 0;
     font-size: 1rem;
+    color: var(--tinta);
   }
-  .veredicto .titulo { font-size: 1.15rem; font-weight: 800; display: block; margin-bottom: 0.3rem; }
-  .veredicto.rojo { background: var(--rojo-claro); color: var(--rojo); border: 1.5px solid #fca5a5; }
-  .veredicto.amarillo { background: var(--amarillo-claro); color: var(--amarillo); border: 1.5px solid #fde047; }
-  .veredicto.verde { background: var(--verde-ok-claro); color: var(--verde-ok); border: 1.5px solid #86efac; }
+  .veredicto .titulo { font-size: 1.125rem; font-weight: 500; display: block; margin-bottom: 0.35rem; }
+  /* El color nunca va solo: palabra + forma (rombo, triángulo, círculo) */
+  .veredicto .titulo::before {
+    content: ""; display: inline-block; width: 0.8em; height: 0.8em;
+    margin-right: 0.45em; vertical-align: -0.05em; background: currentColor;
+  }
+  .veredicto.rojo { background: var(--rojo-claro); }
+  .veredicto.rojo .titulo { color: var(--rojo); }
+  .veredicto.rojo .titulo::before { transform: rotate(45deg) scale(0.85); border-radius: 2px; }
+  .veredicto.amarillo { background: var(--amarillo-claro); }
+  .veredicto.amarillo .titulo { color: var(--amarillo); }
+  .veredicto.amarillo .titulo::before { clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+  .veredicto.verde { background: var(--verde-ok-claro); }
+  .veredicto.verde .titulo { color: var(--verde-ok); }
+  .veredicto.verde .titulo::before { border-radius: 50%; }
 
   .dato-grande {
     text-align: center;
     padding: 0.8rem 0.5rem;
   }
-  .dato-grande .numero { font-size: 2rem; font-weight: 800; color: var(--verde-oscuro); display: block; line-height: 1.15; }
-  .dato-grande .etiqueta { font-size: 0.85rem; color: var(--texto-suave); }
+  .dato-grande .numero { font-size: 1.875rem; font-weight: 500; color: var(--pino); display: block; line-height: 1.15; }
+  .dato-grande .etiqueta { font-size: 0.875rem; color: var(--texto-suave); }
   .datos-fila { display: flex; gap: 0.5rem; margin: 0.5rem 0; }
-  .datos-fila .dato-grande { flex: 1; background: #fafaf9; border-radius: 12px; }
+  .datos-fila .dato-grande { flex: 1; background: var(--crema); border-radius: 12px; }
+  .tarjeta.lograda .datos-fila .dato-grande { background: white; }
   .dato-grande.malo .numero { color: var(--rojo); }
 
   /* Barra comparativa de precio contado vs total pagado */
   .barra-comparacion { margin: 1rem 0; }
   .barra-comparacion .linea { margin-bottom: 0.7rem; }
-  .barra-comparacion .nombre { font-size: 0.85rem; font-weight: 600; margin-bottom: 3px; }
+  .barra-comparacion .nombre { font-size: 0.875rem; font-weight: 500; margin-bottom: 3px; }
   .barra-comparacion .barra {
-    height: 34px;
+    height: 36px;
     border-radius: 8px;
     display: flex;
     align-items: center;
     padding-left: 0.6rem;
     color: white;
-    font-weight: 700;
-    font-size: 0.95rem;
+    font-weight: 500;
+    font-size: 1rem;
     min-width: fit-content;
     white-space: nowrap;
     padding-right: 0.6rem;
   }
-  .barra.contado { background: var(--verde); }
+  .barra.contado { background: var(--pino); }
   .barra.total { background: var(--rojo); }
 
-  table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 0.6rem 0; }
-  th, td { text-align: left; padding: 0.45rem 0.4rem; border-bottom: 1px solid var(--borde); }
-  th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.3px; color: var(--texto-suave); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; margin: 0.6rem 0; }
+  th, td { text-align: left; padding: 0.5rem 0.4rem; border-bottom: 1px solid var(--borde); }
+  th { font-size: 0.875rem; font-weight: 500; color: var(--texto-suave); }
   td.num, th.num { text-align: right; }
 
   /* ---------- Lista de deudas ---------- */
@@ -183,64 +249,74 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #fafaf9;
+    background: var(--crema);
     border: 1px solid var(--borde);
-    border-radius: 10px;
-    padding: 0.6rem 0.8rem;
-    margin: 0.4rem 0;
-    gap: 0.5rem;
+    border-radius: 12px;
+    padding: 0.65rem 0.8rem;
+    margin: 0.45rem 0;
+    gap: 0.6rem;
   }
   .deuda-item .info { flex: 1; }
-  .deuda-item .nombre { font-weight: 700; }
-  .deuda-item .detalle { font-size: 0.85rem; color: var(--texto-suave); }
+  .deuda-item .nombre { font-weight: 500; }
+  .deuda-item .detalle { font-size: 0.875rem; color: var(--texto-suave); }
   .deuda-item button {
     background: none; border: none; color: var(--rojo);
-    font-size: 1.3rem; cursor: pointer; padding: 0.3rem;
+    font-size: 1.3rem; cursor: pointer;
+    min-width: 44px; min-height: 44px; border-radius: 10px;
   }
   .orden-numero {
-    background: var(--verde);
+    background: var(--pino);
     color: white;
     border-radius: 50%;
-    width: 28px; height: 28px;
+    width: 30px; height: 30px;
     display: inline-flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 0.9rem;
+    font-weight: 500; font-size: 0.9375rem;
     flex-shrink: 0;
   }
 
   /* ---------- Sección aprende ---------- */
   details {
     background: white;
-    border: 1px solid var(--borde);
-    border-radius: 12px;
+    border-radius: var(--radio);
     margin: 0.6rem 0;
     box-shadow: var(--sombra);
   }
   details summary {
     padding: 0.9rem 1rem;
-    font-weight: 700;
+    min-height: 56px;
+    font-weight: 500;
     cursor: pointer;
     list-style: none;
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
-  details summary::after { content: "+"; margin-left: auto; font-size: 1.3rem; color: var(--verde); }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::after {
+    content: "+"; margin-left: auto; flex-shrink: 0;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--salvia); color: var(--pino);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.15rem; line-height: 1;
+  }
   details[open] summary::after { content: "−"; }
-  details .contenido { padding: 0 1rem 1rem; color: var(--texto); font-size: 0.95rem; }
-  details .contenido p { margin: 0.5rem 0; }
+  details .contenido { padding: 0 1rem 1rem; color: var(--texto); font-size: 1rem; }
+  details .contenido p { margin: 0.55rem 0; }
   details .contenido ul { margin: 0.5rem 0 0.5rem 1.2rem; }
   details .contenido li { margin: 0.3rem 0; }
 
+  /* Mensaje personal de apoyo: fondo terracota, texto tinta */
   .nota-apoyo {
-    background: var(--verde-claro);
-    border-radius: 14px;
+    background: var(--terracota);
+    border-radius: 18px;
     padding: 1rem 1.1rem;
     margin: 1.2rem 0;
-    font-size: 0.95rem;
-    color: var(--verde-oscuro);
+    font-size: 1rem;
+    color: var(--tinta);
   }
+  .nota-apoyo strong { color: var(--tinta); }
 
-  .aviso-privacidad { font-size: 0.8rem; color: var(--texto-suave); text-align: center; margin-top: 1rem; }
+  .aviso-privacidad { font-size: 0.875rem; color: var(--texto-suave); text-align: center; margin-top: 1rem; }
 
   /* ---------- Navegación inferior ---------- */
   nav {
@@ -250,28 +326,29 @@
     border-top: 1px solid var(--borde);
     display: flex;
     justify-content: space-around;
-    padding: 0.4rem 0 max(0.4rem, env(safe-area-inset-bottom));
+    padding: 0.35rem 0.25rem max(0.35rem, env(safe-area-inset-bottom));
     z-index: 10;
   }
   nav button {
     background: none;
     border: none;
     font: inherit;
-    font-size: 0.7rem;
+    font-size: 0.75rem; /* 7 pestañas en 360 px: excepción al mínimo de 14 px */
+    line-height: 1rem;
     color: var(--texto-suave);
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1px;
-    padding: 0.3rem 0.6rem;
-    border-radius: 10px;
+    gap: 2px;
+    padding: 0.3rem 0.1rem;
+    min-height: 52px;
+    border-radius: 12px;
     flex: 1;
     max-width: 110px;
   }
-  nav button { font-size: 0.62rem; padding: 0.3rem 0.2rem; }
-  nav button .icono { font-size: 1.25rem; }
-  nav button.activo { color: var(--verde); font-weight: 700; background: var(--verde-claro); }
+  nav button .icono { font-size: 1.25rem; line-height: 1.5rem; }
+  nav button.activo { color: var(--pino); font-weight: 500; background: var(--salvia); }
 
   /* ---------- Presupuesto ---------- */
   :root {
@@ -284,59 +361,61 @@
   .fila-opcional {
     display: flex; align-items: center; gap: 0.5rem;
     margin: 0.9rem 0 0.2rem;
-    font-weight: 600; font-size: 0.92rem;
+    font-weight: 500; font-size: 1rem;
   }
-  .fila-opcional input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--verde); flex-shrink: 0; }
+  .fila-opcional label { margin: 0; }
+  .fila-opcional input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--pino); flex-shrink: 0; }
   .boton-info {
-    font: inherit; font-size: 0.78rem; font-weight: 700;
-    background: var(--verde-claro); color: var(--verde-oscuro);
-    border: none; border-radius: 99px; padding: 0.25rem 0.7rem;
+    font: inherit; font-size: 0.875rem; font-weight: 500;
+    background: var(--salvia); color: var(--pino);
+    border: none; border-radius: 99px; padding: 0.35rem 0.8rem; min-height: 36px;
     cursor: pointer; margin-left: auto; flex-shrink: 0;
   }
 
   .modal-fondo {
     position: fixed; inset: 0; z-index: 50;
-    background: rgba(28, 25, 23, 0.55);
+    background: rgba(42, 38, 34, 0.55);
     display: none; align-items: center; justify-content: center;
     padding: 1.2rem;
   }
   .modal-fondo.visible { display: flex; }
   .modal {
-    background: white; border-radius: 16px;
+    background: var(--crema); border-radius: 20px;
     max-width: 430px; max-height: 80vh; overflow-y: auto;
-    padding: 1.2rem 1.2rem 1rem;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+    padding: 1.3rem 1.2rem 1.1rem;
+    box-shadow: 0 8px 28px rgba(42, 38, 34, 0.2);
   }
-  .modal h3 { margin: 0 0 0.5rem; color: var(--verde-oscuro); }
-  .modal p, .modal li { font-size: 0.93rem; margin: 0.5rem 0; }
+  .modal h3 { margin: 0 0 0.5rem; color: var(--tinta); }
+  .modal p, .modal li { font-size: 1rem; margin: 0.5rem 0; }
   .modal ul { margin: 0.5rem 0 0.5rem 1.1rem; }
   .presets { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 0.6rem 0; }
   .presets button {
     font: inherit;
-    font-size: 0.85rem;
+    font-size: 0.875rem;
     background: white;
     border: 1.5px solid var(--borde);
-    border-radius: 10px;
-    padding: 0.55rem 0.4rem;
+    border-radius: 12px;
+    padding: 0.6rem 0.5rem;
+    min-height: 56px;
     cursor: pointer;
-    color: var(--texto);
+    color: var(--texto-suave);
   }
-  .presets button strong { display: block; color: var(--verde-oscuro); }
-  .presets button.sugerido { border-color: var(--verde); background: var(--verde-claro); grid-column: 1 / -1; }
-  .presets button.activo { border-color: var(--verde); background: var(--verde-claro); }
+  .presets button strong { display: block; font-size: 1rem; font-weight: 500; color: var(--pino); }
+  .presets button.sugerido { border-color: var(--pino); background: var(--salvia); grid-column: 1 / -1; color: var(--tinta); }
+  .presets button.activo { border-color: var(--pino); background: var(--salvia); }
 
   .control-pct { margin: 0.75rem 0; }
   .control-pct .fila-pct {
     display: flex; justify-content: space-between; align-items: baseline;
-    font-size: 0.9rem; font-weight: 600; margin-bottom: 2px;
+    font-size: 0.9375rem; font-weight: 500; margin-bottom: 2px;
   }
   .control-pct .punto {
-    display: inline-block; width: 11px; height: 11px; border-radius: 3px;
+    display: inline-block; width: 12px; height: 12px; border-radius: 3px;
     margin-right: 6px; vertical-align: baseline;
   }
-  .control-pct .valor-pct { font-weight: 800; }
-  .control-pct .valor-dinero { font-weight: 400; color: var(--texto-suave); font-size: 0.8rem; margin-left: 6px; }
-  .control-pct input[type="range"] { width: 100%; accent-color: var(--verde); }
+  .control-pct .valor-pct { font-weight: 500; }
+  .control-pct .valor-dinero { font-weight: 400; color: var(--texto-suave); font-size: 0.875rem; margin-left: 6px; }
+  .control-pct input[type="range"] { width: 100%; min-height: 32px; accent-color: var(--pino); }
 
   .dona-envoltura { display: flex; flex-direction: column; align-items: center; padding: 0.5rem 0; }
   .dona {
@@ -349,20 +428,20 @@
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     text-align: center;
   }
-  .dona-centro .monto { font-size: 1.15rem; font-weight: 800; color: var(--verde-oscuro); }
-  .dona-centro .sub { font-size: 0.7rem; color: var(--texto-suave); }
+  .dona-centro .monto { font-size: 1.25rem; font-weight: 500; color: var(--pino); }
+  .dona-centro .sub { font-size: 0.875rem; color: var(--texto-suave); }
 
   .leyenda { width: 100%; margin-top: 0.8rem; }
   .leyenda .item {
-    display: flex; align-items: center; gap: 0.5rem;
-    padding: 0.35rem 0; border-bottom: 1px solid var(--borde);
-    font-size: 0.92rem;
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.45rem 0; border-bottom: 1px solid var(--borde);
+    font-size: 0.9375rem;
   }
   .leyenda .item:last-child { border-bottom: none; }
-  .leyenda .punto { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .leyenda .punto { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
   .leyenda .nombre { flex: 1; }
-  .leyenda .cifra { font-weight: 700; }
-  .leyenda .pct { color: var(--texto-suave); font-size: 0.82rem; width: 40px; text-align: right; }
+  .leyenda .cifra { font-weight: 500; }
+  .leyenda .pct { color: var(--texto-suave); font-size: 0.875rem; width: 44px; text-align: right; }
 
   /* ---------- Chat ---------- */
   .selector-persona { display: flex; gap: 0.6rem; margin: 0.8rem 0; }
@@ -370,21 +449,22 @@
     flex: 1;
     font: inherit;
     background: white;
-    border: 2px solid var(--borde);
-    border-radius: 14px;
-    padding: 0.7rem 0.4rem;
+    border: 2px solid transparent;
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    padding: 0.75rem 0.4rem;
     cursor: pointer;
     text-align: center;
+    color: var(--texto);
   }
   .selector-persona button .avatar { font-size: 1.8rem; display: block; }
-  .selector-persona button strong { font-size: 0.95rem; color: var(--verde-oscuro); display: block; }
-  .selector-persona button span.rol { font-size: 0.75rem; color: var(--texto-suave); }
-  .selector-persona button.activo { border-color: var(--verde); background: var(--verde-claro); }
+  .selector-persona button strong { font-size: 1rem; font-weight: 500; color: var(--pino); display: block; }
+  .selector-persona button span.rol { font-size: 0.875rem; color: var(--texto-suave); }
+  .selector-persona button.activo { border-color: var(--pino); background: var(--salvia); box-shadow: none; }
 
   .chat-caja {
     background: white;
-    border: 1px solid var(--borde);
-    border-radius: 14px;
+    border-radius: var(--radio);
     box-shadow: var(--sombra);
     display: flex;
     flex-direction: column;
@@ -401,27 +481,28 @@
   }
   .burbuja {
     max-width: 88%;
-    padding: 0.6rem 0.8rem;
-    border-radius: 14px;
-    font-size: 0.95rem;
+    padding: 0.65rem 0.85rem;
+    border-radius: 16px;
+    font-size: 1rem;
     line-height: 1.45;
     white-space: pre-wrap;
     word-wrap: break-word;
   }
-  .burbuja.bot { background: #f5f5f4; border-bottom-left-radius: 4px; align-self: flex-start; }
-  .burbuja.usuario { background: var(--verde); color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
+  .burbuja.bot { background: var(--arena); color: var(--tinta); border-bottom-left-radius: 4px; align-self: flex-start; }
+  .burbuja.usuario { background: var(--pino); color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
   .burbuja.escribiendo { color: var(--texto-suave); font-style: italic; }
-  .burbuja .quien { display: block; font-size: 0.72rem; font-weight: 700; color: var(--verde-oscuro); margin-bottom: 2px; }
+  .burbuja .quien { display: block; font-size: 0.875rem; font-weight: 500; color: var(--pino); margin-bottom: 2px; }
 
-  .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0 0.9rem 0.7rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.45rem; padding: 0 0.9rem 0.7rem; }
   .chips button {
     font: inherit;
-    font-size: 0.8rem;
-    background: var(--verde-claro);
-    color: var(--verde-oscuro);
+    font-size: 0.875rem;
+    background: var(--salvia);
+    color: var(--pino);
     border: none;
     border-radius: 99px;
-    padding: 0.4rem 0.75rem;
+    padding: 0.5rem 0.85rem;
+    min-height: 40px;
     cursor: pointer;
   }
   .chat-entrada {
@@ -434,13 +515,14 @@
     flex: 1;
     font: inherit;
     font-size: 1rem;
+    min-height: 44px;
     border: 1.5px solid var(--borde);
     border-radius: 99px;
-    padding: 0.55rem 0.9rem;
+    padding: 0.55rem 0.95rem;
   }
   .chat-entrada button {
     font: inherit;
-    background: var(--verde);
+    background: var(--pino);
     color: white;
     border: none;
     border-radius: 99px;
@@ -451,7 +533,7 @@
   }
   .chat-entrada button:disabled { opacity: 0.5; }
   .aviso-chat {
-    font-size: 0.72rem;
+    font-size: 0.875rem;
     color: var(--texto-suave);
     text-align: center;
     padding: 0 0.8rem 0.6rem;
@@ -461,9 +543,11 @@
 <body>
 
 <header>
-  <h1>💡 Libre de Deudas</h1>
-  <p>Entiende tus deudas. Sal adelante.</p>
-  <p style="font-size:0.72rem; opacity:0.75; margin-top:3px">Un proyecto de la Fundación Berit</p>
+  <h1 class="logo">
+    <svg class="logo-icono" viewBox="0 0 120 120" aria-hidden="true" focusable="false"><rect width="120" height="120" rx="28.8" fill="#DFE8D6"/><g fill="#E8B547"><rect x="57.35" y="31.7" width="5.3" height="12.5" rx="2.65" transform="rotate(-64 60 74.4)"/><rect x="57.35" y="31.7" width="5.3" height="12.5" rx="2.65" transform="rotate(-32 60 74.4)"/><rect x="57.35" y="31.7" width="5.3" height="12.5" rx="2.65" transform="rotate(0 60 74.4)"/><rect x="57.35" y="31.7" width="5.3" height="12.5" rx="2.65" transform="rotate(32 60 74.4)"/><rect x="57.35" y="31.7" width="5.3" height="12.5" rx="2.65" transform="rotate(64 60 74.4)"/><path d="M36 74.4a24 24 0 0 1 48 0z"/></g><rect x="19.2" y="71.1" width="81.6" height="6.6" rx="3.3" fill="#3E5F3A"/></svg>
+    <span class="logo-textos"><span class="logo-nombre">Libre de Deudas</span><span class="logo-firma">de Fundación Berit</span></span>
+  </h1>
+  <p class="lema">Entiende tus deudas. Sal adelante.</p>
 </header>
 
 <main>
@@ -515,14 +599,14 @@
       <span class="desc">¿Una deuda cara no te deja vivir? El Fondo Solidario Berit te ayuda a salir, con un préstamo solidario a interés bajo.</span>
     </button>
 
-    <div class="tarjeta" style="border-color:#86efac">
+    <div class="tarjeta destacada">
       <h3 style="margin-top:0">💚 ¿Te sirvió Libre de Deudas?</h3>
       <p style="font-size:0.92rem">Este proyecto es gratuito y sin fines de lucro: no vendemos nada, no hay publicidad y no pedimos tus datos. Si quieres que siga creciendo y ayudando a más personas a salir de deudas, hay dos formas de apoyar:</p>
       <p style="font-size:0.92rem; margin-top:0.5rem"><strong>1. Comparte la página.</strong> Es gratis y es la ayuda más valiosa: que llegue a quien la necesita antes de que firme.</p>
       <button class="secundario" id="boton-compartir" onclick="compartirPagina()">📲 Compartir con alguien</button>
       <p style="font-size:0.92rem; margin-top:0.8rem"><strong>2. Aporta voluntariamente.</strong> Tu aporte cubre los costos de mantener la página y el chat funcionando. Nunca será un requisito: aquí todo es y seguirá siendo gratis.</p>
       <div id="donacion-botones"></div>
-      <p id="donacion-pronto" style="font-size:0.82rem; color:var(--texto-suave); margin-top:0.4rem">Muy pronto habilitaremos una forma segura de aportar.</p>
+      <p id="donacion-pronto" style="font-size:0.875rem; color:var(--texto-suave); margin-top:0.4rem">Muy pronto habilitaremos una forma segura de aportar.</p>
     </div>
 
     <div class="tarjeta">
@@ -531,7 +615,7 @@
       <button class="secundario" onclick="guardarRespaldo()">💾 Guardar mi respaldo</button>
       <button class="secundario" onclick="document.getElementById('archivo-respaldo').click()">📂 Recuperar un respaldo</button>
       <input type="file" id="archivo-respaldo" accept=".json,application/json" style="display:none" onchange="recuperarRespaldo(this)">
-      <p id="respaldo-aviso" style="font-size:0.82rem; color:var(--texto-suave); margin-top:0.4rem"></p>
+      <p id="respaldo-aviso" style="font-size:0.875rem; color:var(--texto-suave); margin-top:0.4rem"></p>
     </div>
 
     <div class="nota-apoyo">
@@ -924,11 +1008,11 @@
       <textarea id="f-situacion" maxlength="1500" placeholder="Escribe con confianza, te leemos con respeto."></textarea>
       <input type="text" id="f-miel" autocomplete="off" tabindex="-1" style="position:absolute; left:-9999px" aria-hidden="true">
       <button class="principal" id="f-enviar" onclick="enviarSolicitudFondo()" style="margin-top:1rem">📨 Enviar mi solicitud</button>
-      <p id="f-aviso" style="font-size:0.88rem; color:var(--rojo); margin-top:0.5rem"></p>
-      <p style="font-size:0.82rem; color:var(--texto-suave); margin-top:0.6rem">🔒 Tu solicitud incluye un resumen de las deudas y el presupuesto que anotaste en la app (así podemos evaluar tu caso) y viaja directo al correo de la Fundación Berit. No se guarda en ninguna base de datos ni se comparte con nadie.</p>
+      <p id="f-aviso" style="font-size:0.875rem; color:var(--rojo); margin-top:0.5rem"></p>
+      <p style="font-size:0.875rem; color:var(--texto-suave); margin-top:0.6rem">🔒 Tu solicitud incluye un resumen de las deudas y el presupuesto que anotaste en la app (así podemos evaluar tu caso) y viaja directo al correo de la Fundación Berit. No se guarda en ninguna base de datos ni se comparte con nadie.</p>
     </div>
 
-    <div class="tarjeta" id="fondo-gracias" style="display:none; border-color:#86efac">
+    <div class="tarjeta lograda" id="fondo-gracias" style="display:none">
       <h3 style="margin-top:0">✅ ¡Tu solicitud se envió!</h3>
       <p style="font-size:0.95rem">Gracias por confiar y contarnos tu situación. Si tu caso puede avanzar, te escribiremos por WhatsApp. Mientras tanto, el plan bola de nieve 🧗 y el presupuesto 💰 de esta página son tus mejores aliados — y son gratis para siempre.</p>
     </div>
@@ -1047,15 +1131,15 @@ function calcularCuotas() {
     textoVeredicto = 'Pagarías prácticamente lo mismo que de contado. Si la cuota te alcanza cómodamente, es un trato razonable. Igual confirma que no haya cargos extra: seguros, comisiones o cuotas de "manejo".';
   } else if (tasaAnual <= 20) {
     claseVeredicto = 'verde';
-    tituloVeredicto = '🟢 Recargo moderado';
+    tituloVeredicto = 'Recargo moderado';
     textoVeredicto = 'El interés es parecido al de un crédito bancario normal. No es gratis: igual pagas ' + dinero(sobreprecio) + ' extra. Vale la pena si es algo que realmente necesitas y la cuota no te aprieta.';
   } else if (tasaAnual <= 50) {
     claseVeredicto = 'amarillo';
-    tituloVeredicto = '🟡 Cuidado: esto es caro';
+    tituloVeredicto = 'Cuidado: esto es caro';
     textoVeredicto = 'Este crédito te cobra un interés bastante más alto que un banco. Pregunta en una cooperativa o banco si te pueden financiar más barato, o considera ahorrar unas semanas y comprar de contado algo más sencillo.';
   } else {
     claseVeredicto = 'rojo';
-    tituloVeredicto = '🔴 ¡Alerta! Es carísimo';
+    tituloVeredicto = '¡Alerta! Es carísimo';
     textoVeredicto = 'Estarías pagando un interés altísimo. Con este trato, de cada dólar que pagas, gran parte es puro interés. Piénsalo dos veces: ¿de verdad lo necesitas YA, o puedes ahorrar unas semanas y comprar de contado?';
   }
 
@@ -1099,7 +1183,7 @@ function calcularCuotas() {
           <span class="etiqueta">pagando esta deuda</span>
         </div>
       </div>
-      <p style="font-size:0.8rem; color:var(--texto-suave)">*Calculado con tus números. Para comparar: un crédito de consumo en un banco ecuatoriano cobra alrededor de 16% anual.</p>
+      <p style="font-size:0.875rem; color:var(--texto-suave)">*Calculado con tus números. Para comparar: un crédito de consumo en un banco ecuatoriano cobra alrededor de 16% anual.</p>
     </div>
 
     <div class="tarjeta">
@@ -1134,7 +1218,7 @@ function calcularTarjeta() {
   if (pago <= interesPrimerMes) {
     caja.innerHTML = `
       <div class="veredicto rojo">
-        <span class="titulo">🔴 Con ese pago, la deuda NUNCA baja</span>
+        <span class="titulo">Con ese pago, la deuda NUNCA baja</span>
         Solo los intereses de este mes son ${dinero(interesPrimerMes)}. Como pagas ${dinero(pago)}, tu deuda crece en vez de bajar. Necesitas pagar más que ${dinero(interesPrimerMes)} al mes, aunque sea un poquito más, para empezar a salir. Si no te alcanza, llama YA a tu banco y pide refinanciar: es tu derecho.
       </div>`;
     caja.classList.add('visible');
@@ -1187,7 +1271,7 @@ function calcularTarjeta() {
       </div>
     </div>
 
-    <div class="tarjeta" style="border-color:#86efac; background:#f0fdf4">
+    <div class="tarjeta lograda">
       <h3>💪 ¿Y si pagaras solo $20 más al mes?</h3>
       <p style="font-size:0.95rem">Pagando ${dinero(pago + 20)} en vez de ${dinero(pago)}:</p>
       <div class="datos-fila">
@@ -1366,7 +1450,7 @@ function calcularPlan() {
   if (imposible || mes >= maxMeses) {
     caja.innerHTML = `
       <div class="veredicto rojo">
-        <span class="titulo">🔴 Con estos pagos, las deudas no bajan</span>
+        <span class="titulo">Con estos pagos, las deudas no bajan</span>
         Los intereses crecen más rápido que tus pagos. No es tu culpa: así están diseñadas algunas deudas. Qué hacer: (1) llama a tus bancos y pide <strong>refinanciar</strong> — cuotas más bajas o mejor tasa; (2) prioriza la deuda con el interés más alto; (3) busca aunque sea $10 extra al mes. Si necesitas ayuda, la Defensoría del Pueblo orienta gratis en temas de deudas.
       </div>`;
     caja.classList.add('visible');
@@ -1382,7 +1466,7 @@ function calcularPlan() {
 
   caja.innerHTML = `
     <div class="veredicto verde">
-      <span class="titulo">🎉 ¡Tienes plan! Serías libre de deudas en ${tiempoTexto}</span>
+      <span class="titulo">¡Tienes plan! Serías libre de deudas en ${tiempoTexto}</span>
       Pagando tus cuotas (${dinero(totalCuotas)}/mes) más ${dinero(extra)} extra, terminarías cerca de <strong>${fechaTexto}</strong>.
     </div>
 
@@ -1570,7 +1654,7 @@ async function presupuestoConIA() {
     pintarPresupuesto();
     const extra = document.createElement("div");
     extra.className = "veredicto verde";
-    extra.innerHTML = '<span class="titulo">🤖 Listo, la IA te propone este reparto</span>' + escaparHtml(datos.explicacion || "") + " Si algo no te cuadra, ajusta los deslizadores: tú mandas.";
+    extra.innerHTML = '<span class="titulo">Listo, la IA te propone este reparto</span>' + escaparHtml(datos.explicacion || "") + " Si algo no te cuadra, ajusta los deslizadores: tú mandas.";
     feedback.prepend(extra);
   } catch (e) {
     feedback.innerHTML =
@@ -1632,7 +1716,7 @@ function pintarPresupuesto() {
     acumulado += p;
   }
   document.getElementById("p-dona").style.background =
-    tramos.length ? `conic-gradient(${tramos.join(",")})` : "#e7e5e4";
+    tramos.length ? `conic-gradient(${tramos.join(",")})` : "var(--arena)";
   document.getElementById("p-dona-monto").textContent = ingreso ? dinero(ingreso) : "Pon tu ingreso";
   document.getElementById("p-dona-sub").textContent = ingreso ? "al mes" : "aquí arriba ☝️";
 
@@ -1662,24 +1746,24 @@ function pintarFeedbackPresupuesto() {
     if (cuotas > 0) {
       const cargaReal = cuotas / ingreso;
       if (cargaReal > 0.45) {
-        mensajes.push(`<div class="veredicto rojo"><span class="titulo">🚨 Tus cuotas pesan demasiado</span>Solo tus cuotas mínimas (${dinero(cuotas)}) ya se llevan el ${Math.round(cargaReal * 100)}% de tu ingreso. Más del 45% es señal de alerta. No esperes a atrasarte: habla YA con tus bancos y pide refinanciar — es tu derecho, y con el cliente al día negocian mejor.</div>`);
+        mensajes.push(`<div class="veredicto rojo"><span class="titulo">Tus cuotas pesan demasiado</span>Solo tus cuotas mínimas (${dinero(cuotas)}) ya se llevan el ${Math.round(cargaReal * 100)}% de tu ingreso. Más del 45% es señal de alerta. No esperes a atrasarte: habla YA con tus bancos y pide refinanciar — es tu derecho, y con el cliente al día negocian mejor.</div>`);
       }
       if (paraDeudas < cuotas - 0.5) {
-        mensajes.push(`<div class="veredicto amarillo"><span class="titulo">⚠️ No alcanza para las cuotas</span>Tus cuotas mínimas suman ${dinero(cuotas)}, pero este reparto solo destina ${dinero(paraDeudas)} a deudas. Faltan ${dinero(cuotas - paraDeudas)}. Sube el % de deudas (o usa "Sugerido para mí").</div>`);
+        mensajes.push(`<div class="veredicto amarillo"><span class="titulo">No alcanza para las cuotas</span>Tus cuotas mínimas suman ${dinero(cuotas)}, pero este reparto solo destina ${dinero(paraDeudas)} a deudas. Faltan ${dinero(cuotas - paraDeudas)}. Sube el % de deudas (o usa "Sugerido para mí").</div>`);
       } else if (paraDeudas > cuotas + 1) {
-        mensajes.push(`<div class="veredicto verde"><span class="titulo">💪 Tienes bola de nieve</span>Después de pagar tus mínimos (${dinero(cuotas)}) te quedan ${dinero(paraDeudas - cuotas)} extra para deudas. Ve a 🧗 Plan y ponlos como "extra al mes": cada dólar ahí te saca meses antes.</div>`);
+        mensajes.push(`<div class="veredicto verde"><span class="titulo">Tienes bola de nieve</span>Después de pagar tus mínimos (${dinero(cuotas)}) te quedan ${dinero(paraDeudas - cuotas)} extra para deudas. Ve a 🧗 Plan y ponlos como "extra al mes": cada dólar ahí te saca meses antes.</div>`);
       }
     }
 
     if (pct.ahorro > 0) {
       const ahorroMes = (ingreso * pct.ahorro) / 100;
-      mensajes.push(`<div class="veredicto verde"><span class="titulo">🐖 Tu colchón crece</span>Ahorrando ${dinero(ahorroMes)} al mes, en un año tienes ${dinero(ahorroMes * 12)}. Ese colchón es lo que evita que una emergencia te mande al chulco o a la tarjeta.</div>`);
+      mensajes.push(`<div class="veredicto verde"><span class="titulo">Tu colchón crece</span>Ahorrando ${dinero(ahorroMes)} al mes, en un año tienes ${dinero(ahorroMes * 12)}. Ese colchón es lo que evita que una emergencia te mande al chulco o a la tarjeta.</div>`);
     } else {
-      mensajes.push(`<div class="veredicto amarillo"><span class="titulo">🤔 Sin nada de ahorro</span>Aunque sea un 2–5%, aparta algo: sin colchón, cualquier emergencia se paga con deuda nueva. Separa primero, gasta después.</div>`);
+      mensajes.push(`<div class="veredicto amarillo"><span class="titulo">Sin nada de ahorro</span>Aunque sea un 2–5%, aparta algo: sin colchón, cualquier emergencia se paga con deuda nueva. Separa primero, gasta después.</div>`);
     }
 
     if (pct.vida < 40) {
-      mensajes.push(`<div class="veredicto amarillo"><span class="titulo">🏠 ¿Te alcanza para vivir?</span>Menos del 40% para costos de vida (comida, arriendo, transporte, servicios) suele ser poco realista. Un presupuesto que no se puede cumplir se abandona: mejor honesto que perfecto.</div>`);
+      mensajes.push(`<div class="veredicto amarillo"><span class="titulo">¿Te alcanza para vivir?</span>Menos del 40% para costos de vida (comida, arriendo, transporte, servicios) suele ser poco realista. Un presupuesto que no se puede cumplir se abandona: mejor honesto que perfecto.</div>`);
     }
   }
 
