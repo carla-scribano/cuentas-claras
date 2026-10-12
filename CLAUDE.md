@@ -58,4 +58,5 @@ Plan completo en `~/.claude/plans/okay-te-puse-en-delegated-stream.md`. Orden: (
 
 - Enlace de donaciones: la tarjeta "¿Te sirvió?" en Inicio tiene `ENLACES_DONACION = []` en index.html esperando un PayPal.Me o enlace deUna de Carla (pospuesto hasta que lo cree).
 - Hecho: dominio propio (librededeudas.beritfundacion.org, octubre 2026). Siguiente: difusión (PWA y fondo ya están en vivo).
+- App en tiendas (pedido de Carla, octubre 2026): publicar Libre de Deudas en Play Store empaquetando la PWA actual como Trusted Web Activity (no reescribir la app). Requiere cuenta de desarrollador de Google Play de Carla (pago único) y el archivo `.well-known/assetlinks.json` en el dominio. App Store de Apple: evaluar después (cuota anual y Apple suele rechazar apps que solo envuelven una web).
 - Ideas futuras en README.md (audio para WhatsApp, kichwa, validar tasas BCE).
