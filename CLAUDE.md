@@ -47,6 +47,8 @@ El manual vive fuera del repo, en la carpeta privada de Carla `~/GitHub/Fundacio
 - Tipografía: solo fuente del sistema. Títulos sin negrita (h2 24/30 regular, h3 20/26 medium), texto 16/24, mínimo 14 px (excepción: etiquetas de la barra inferior, 12 px, por las 7 pestañas), botones 48 px de alto en medium.
 - Logo de la cabecera e íconos de la app: sol con 5 rayos sobre el horizonte, en salvia/sol/pino. El logo está dibujado como SVG dentro de index.html; los PNG de los íconos se generan del mismo dibujo.
 - No usar fuentes externas (Source Serif/Sans son solo para redes e impresos).
+- Inicio como en la maqueta del manual: saludo, portada salvia con el sol y la acción principal "Armar mi plan" (va al Plan), cuatro herramientas (Calculadoras → pantalla `calculadoras` que agrupa Cuotas y Tarjeta; Mi presupuesto; Conversemos; Fondo Solidario Berit) y la frase "Deber plata no te hace mala persona". Debajo siguen el respaldo, el apoyo al proyecto y la nota de apoyo con la línea 171/911. Aprende se entra desde la barra inferior.
+- Cabecera y barra inferior en terracota (pedido de Carla: más del rosa suave); theme-color #F2CDB8.
 
 ## Hoja de ruta acordada (sesión de planeación, octubre 2026)
 

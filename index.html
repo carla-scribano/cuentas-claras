@@ -129,6 +129,50 @@
   .tarjeta-boton strong { font-size: 1rem; font-weight: 500; color: var(--tinta); align-self: end; }
   .tarjeta-boton span.desc { display: block; color: var(--texto-suave); font-size: 0.875rem; line-height: 1.25rem; margin-top: 1px; align-self: start; }
 
+  /* ---------- Inicio (manual de marca): portada, cuatro herramientas y frase ---------- */
+  .portada {
+    position: relative;
+    overflow: hidden;
+    background: var(--salvia);
+    border-radius: 20px;
+    padding: 1.1rem 1.25rem 1.15rem;
+    margin: 0.9rem 0 0.9rem;
+    min-height: 168px;
+    display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start;
+  }
+  .portada-sol { position: absolute; right: 0; bottom: 0; width: 130px; height: 90px; }
+  .portada-texto { position: relative; font-size: 1rem; line-height: 1.375rem; color: var(--tinta); max-width: 190px; }
+  button.principal.portada-boton { position: relative; display: inline-flex; width: auto; margin-top: 1rem; padding: 0.75rem 1.15rem; }
+
+  .herramientas { display: flex; flex-direction: column; gap: 0.5rem; }
+  .herramienta {
+    display: flex; align-items: center; gap: 0.75rem;
+    width: 100%; min-height: 64px;
+    font: inherit; text-align: left; cursor: pointer;
+    background: white; color: var(--tinta);
+    border: none; border-radius: var(--radio);
+    padding: 0.65rem 0.8rem;
+    box-shadow: var(--sombra);
+    transition: transform 0.1s ease;
+  }
+  .herramienta:active { transform: scale(0.985); }
+  .herramienta:focus-visible { outline: 2px solid var(--pino); outline-offset: 2px; }
+  .herramienta-icono {
+    width: 40px; height: 40px; flex-shrink: 0;
+    border-radius: 10px; background: var(--salvia);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+  }
+  .herramienta[onclick*="'dinero'"] .herramienta-icono { background: var(--miel); }
+  .herramienta[onclick*="'chat'"] .herramienta-icono { background: var(--arena); }
+  .herramienta[onclick*="'fondo'"] .herramienta-icono { background: var(--terracota); }
+  .herramienta-textos { display: flex; flex-direction: column; gap: 1px; }
+  .herramienta-textos strong { font-size: 1rem; font-weight: 500; }
+  .herramienta-textos span { font-size: 0.875rem; color: var(--texto-suave); }
+
+  .frase-marca { font-size: 0.875rem; color: var(--pino); margin: 1.1rem 0.25rem 0; }
+  #pantalla-inicio .aviso-privacidad { text-align: left; margin: 0.35rem 0.25rem 0; }
+
   /* ---------- Formularios ---------- */
   label { display: block; font-weight: 500; font-size: 1rem; margin: 1rem 0 0.3rem; color: var(--tinta); }
   label small { font-weight: 400; font-size: 0.875rem; color: var(--texto-suave); display: block; }
@@ -555,8 +599,65 @@
 
   <!-- ============ INICIO ============ -->
   <section id="pantalla-inicio" class="pantalla activa">
-    <h2>¿Qué necesitas hoy?</h2>
-    <p class="intro">Herramientas gratis y fáciles para manejar tu plata. Todo queda en tu teléfono: no pedimos tu nombre, tu cédula ni tus datos.</p>
+    <h2>Hola, qué bueno que estás aquí.</h2>
+
+    <div class="portada">
+      <svg class="portada-sol" viewBox="0 0 130 90" aria-hidden="true" focusable="false"><g fill="#E8B547"><rect x="82.5" y="33" width="7" height="16.6" rx="3.5" transform="rotate(-64 86 90)"/><rect x="82.5" y="33" width="7" height="16.6" rx="3.5" transform="rotate(-32 86 90)"/><rect x="82.5" y="33" width="7" height="16.6" rx="3.5" transform="rotate(0 86 90)"/><rect x="82.5" y="33" width="7" height="16.6" rx="3.5" transform="rotate(32 86 90)"/><rect x="82.5" y="33" width="7" height="16.6" rx="3.5" transform="rotate(64 86 90)"/><circle cx="86" cy="90" r="32"/></g></svg>
+      <p class="portada-texto">Te ayudamos a salir de deudas, gratis y con inteligencia artificial.</p>
+      <button class="principal portada-boton" onclick="irA('plan')">Armar mi plan</button>
+    </div>
+
+    <div class="herramientas">
+      <button class="herramienta" onclick="irA('calculadoras')">
+        <span class="herramienta-icono" aria-hidden="true">🧮</span>
+        <span class="herramienta-textos"><strong>Calculadoras</strong><span>Cuánto debo de verdad</span></span>
+      </button>
+      <button class="herramienta" onclick="irA('dinero')">
+        <span class="herramienta-icono" aria-hidden="true">💰</span>
+        <span class="herramienta-textos"><strong>Mi presupuesto</strong><span>Lo armamos con IA</span></span>
+      </button>
+      <button class="herramienta" onclick="irA('chat')">
+        <span class="herramienta-icono" aria-hidden="true">💬</span>
+        <span class="herramienta-textos"><strong>Conversemos</strong><span>Chat de orientación</span></span>
+      </button>
+      <button class="herramienta" onclick="irA('fondo')">
+        <span class="herramienta-icono" aria-hidden="true">🤝</span>
+        <span class="herramienta-textos"><strong>Fondo Solidario Berit</strong><span>Préstamo con interés bajo</span></span>
+      </button>
+    </div>
+
+    <p class="frase-marca">Deber plata no te hace mala persona.</p>
+    <p class="aviso-privacidad">🔒 Todo queda en tu teléfono: no pedimos tu nombre, tu cédula ni tus datos.</p>
+
+    <div class="tarjeta">
+      <h3 style="margin-top:0">💾 Guarda tu avance</h3>
+      <p style="font-size:0.92rem">Tus deudas y tu presupuesto viven solo en este teléfono: nadie más los ve. Pero si cambias de celular o se borra el navegador, se pierden. Guarda un respaldo de vez en cuando y recupéralo cuando lo necesites.</p>
+      <button class="secundario" onclick="guardarRespaldo()">💾 Guardar mi respaldo</button>
+      <button class="secundario" onclick="document.getElementById('archivo-respaldo').click()">📂 Recuperar un respaldo</button>
+      <input type="file" id="archivo-respaldo" accept=".json,application/json" style="display:none" onchange="recuperarRespaldo(this)">
+      <p id="respaldo-aviso" style="font-size:0.875rem; color:var(--texto-suave); margin-top:0.4rem"></p>
+    </div>
+
+    <div class="tarjeta destacada">
+      <h3 style="margin-top:0">💚 ¿Te sirvió Libre de Deudas?</h3>
+      <p style="font-size:0.92rem">Este proyecto es gratuito y sin fines de lucro: no vendemos nada, no hay publicidad y no pedimos tus datos. Si quieres que siga creciendo y ayudando a más personas a salir de deudas, hay dos formas de apoyar:</p>
+      <p style="font-size:0.92rem; margin-top:0.5rem"><strong>1. Comparte la página.</strong> Es gratis y es la ayuda más valiosa: que llegue a quien la necesita antes de que firme.</p>
+      <button class="secundario" id="boton-compartir" onclick="compartirPagina()">📲 Compartir con alguien</button>
+      <p style="font-size:0.92rem; margin-top:0.8rem"><strong>2. Aporta voluntariamente.</strong> Tu aporte cubre los costos de mantener la página y el chat funcionando. Nunca será un requisito: aquí todo es y seguirá siendo gratis.</p>
+      <div id="donacion-botones"></div>
+      <p id="donacion-pronto" style="font-size:0.875rem; color:var(--texto-suave); margin-top:0.4rem">Muy pronto habilitaremos una forma segura de aportar.</p>
+    </div>
+
+    <div class="nota-apoyo">
+      <strong>Si tus deudas te tienen sin dormir:</strong> respira. Una deuda tiene salida, siempre. No eres mala persona por deber plata: es un problema de números, y los números se arreglan con un plan. Si sientes que ya no puedes más, habla con alguien de confianza o busca apoyo emocional gratuito (en Ecuador: línea 171 opción 6, o el 911 en una emergencia).
+    </div>
+  </section>
+
+  <!-- ============ CALCULADORAS ============ -->
+  <section id="pantalla-calculadoras" class="pantalla">
+    <button class="secundario" onclick="irA('inicio')" style="margin-bottom:0.8rem">← Volver al inicio</button>
+    <h2>🧮 Calculadoras</h2>
+    <p class="intro">Antes de firmar o mientras pagas: mira cuánto te cuesta de verdad.</p>
 
     <button class="tarjeta-boton" onclick="irA('cuotas')">
       <span class="emoji">🛒</span>
@@ -569,59 +670,6 @@
       <strong>Tengo deuda en la tarjeta de crédito</strong>
       <span class="desc">Mira por qué pagando "el mínimo" la deuda casi nunca baja, y cuánto te ahorras pagando un poco más.</span>
     </button>
-
-    <button class="tarjeta-boton" onclick="irA('plan')">
-      <span class="emoji">🧗</span>
-      <strong>Quiero salir de mis deudas</strong>
-      <span class="desc">Arma tu plan paso a paso con el método bola de nieve. Miles de personas han salido así.</span>
-    </button>
-
-    <button class="tarjeta-boton" onclick="irA('aprende')">
-      <span class="emoji">📚</span>
-      <strong>Quiero entender mejor</strong>
-      <span class="desc">Deuda buena vs. deuda mala, cómo funcionan los intereses, señales de alerta y tus derechos.</span>
-    </button>
-
-    <button class="tarjeta-boton" onclick="irA('dinero')">
-      <span class="emoji">💰</span>
-      <strong>Quiero organizar mi plata</strong>
-      <span class="desc">Reparte tu ingreso entre vivir, deudas, ahorro y gustos, y míralo en un pastel. La inteligencia artificial te lo arma si quieres.</span>
-    </button>
-
-    <button class="tarjeta-boton" onclick="irA('chat')">
-      <span class="emoji">💬</span>
-      <strong>Tengo una pregunta</strong>
-      <span class="desc">Pregúntale a Clarita (finanzas) o al Doctor Justo (temas legales). Gratis y sin registrarte.</span>
-    </button>
-
-    <button class="tarjeta-boton" onclick="irA('fondo')">
-      <span class="emoji">🤝</span>
-      <strong>Necesito un respiro</strong>
-      <span class="desc">¿Una deuda cara no te deja vivir? El Fondo Solidario Berit te ayuda a salir, con un préstamo solidario a interés bajo.</span>
-    </button>
-
-    <div class="tarjeta destacada">
-      <h3 style="margin-top:0">💚 ¿Te sirvió Libre de Deudas?</h3>
-      <p style="font-size:0.92rem">Este proyecto es gratuito y sin fines de lucro: no vendemos nada, no hay publicidad y no pedimos tus datos. Si quieres que siga creciendo y ayudando a más personas a salir de deudas, hay dos formas de apoyar:</p>
-      <p style="font-size:0.92rem; margin-top:0.5rem"><strong>1. Comparte la página.</strong> Es gratis y es la ayuda más valiosa: que llegue a quien la necesita antes de que firme.</p>
-      <button class="secundario" id="boton-compartir" onclick="compartirPagina()">📲 Compartir con alguien</button>
-      <p style="font-size:0.92rem; margin-top:0.8rem"><strong>2. Aporta voluntariamente.</strong> Tu aporte cubre los costos de mantener la página y el chat funcionando. Nunca será un requisito: aquí todo es y seguirá siendo gratis.</p>
-      <div id="donacion-botones"></div>
-      <p id="donacion-pronto" style="font-size:0.875rem; color:var(--texto-suave); margin-top:0.4rem">Muy pronto habilitaremos una forma segura de aportar.</p>
-    </div>
-
-    <div class="tarjeta">
-      <h3 style="margin-top:0">💾 Guarda tu avance</h3>
-      <p style="font-size:0.92rem">Tus deudas y tu presupuesto viven solo en este teléfono: nadie más los ve. Pero si cambias de celular o se borra el navegador, se pierden. Guarda un respaldo de vez en cuando y recupéralo cuando lo necesites.</p>
-      <button class="secundario" onclick="guardarRespaldo()">💾 Guardar mi respaldo</button>
-      <button class="secundario" onclick="document.getElementById('archivo-respaldo').click()">📂 Recuperar un respaldo</button>
-      <input type="file" id="archivo-respaldo" accept=".json,application/json" style="display:none" onchange="recuperarRespaldo(this)">
-      <p id="respaldo-aviso" style="font-size:0.875rem; color:var(--texto-suave); margin-top:0.4rem"></p>
-    </div>
-
-    <div class="nota-apoyo">
-      <strong>Si tus deudas te tienen sin dormir:</strong> respira. Una deuda tiene salida, siempre. No eres mala persona por deber plata: es un problema de números, y los números se arreglan con un plan. Si sientes que ya no puedes más, habla con alguien de confianza o busca apoyo emocional gratuito (en Ecuador: línea 171 opción 6, o el 911 en una emergencia).
-    </div>
   </section>
 
   <!-- ============ CALCULADORA DE CUOTAS ============ -->
