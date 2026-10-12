@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Herramientas gratuitas para entender tus deudas, calcular el costo real de comprar a cuotas y armar tu plan para salir de deudas. Hecho para Ecuador y Latinoamérica.">
 <title>Libre de Deudas — Entiende tus deudas y sal adelante</title>
-<meta name="theme-color" content="#FCF8F1">
+<meta name="theme-color" content="#F2CDB8">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
@@ -51,17 +51,16 @@
 
   /* ---------- Cabecera: logo horizontal ---------- */
   header {
-    background: var(--crema);
-    padding: 1rem 1rem 0.4rem;
-    max-width: 640px;
-    margin: 0 auto;
+    background: var(--terracota);
+    padding: 1rem max(1rem, calc((100% - 640px) / 2 + 1rem)) 1rem;
+    border-radius: 0 0 24px 24px;
   }
   header .logo { display: flex; align-items: center; gap: 0.6rem; font-weight: 400; }
   header .logo-icono { width: 40px; height: 40px; flex-shrink: 0; display: block; }
   header .logo-textos { display: flex; flex-direction: column; line-height: 1.15; }
   header .logo-nombre { font-size: 1.25rem; font-weight: 500; color: var(--pino); letter-spacing: 0.1px; }
-  header .logo-firma { font-size: 0.875rem; color: var(--texto-suave); }
-  header .lema { font-size: 0.875rem; color: var(--texto-suave); margin-top: 0.5rem; }
+  header .logo-firma { font-size: 0.875rem; color: var(--tinta); }
+  header .lema { font-size: 0.875rem; color: var(--tinta); margin-top: 0.5rem; }
 
   main { max-width: 640px; margin: 0 auto; padding: 0.4rem 1rem 2rem; }
 
@@ -90,6 +89,7 @@
   .tarjeta.destacada { background: var(--miel); box-shadow: none; }
   .tarjeta.lograda { background: var(--verde-ok-claro); box-shadow: none; }
   .tarjeta.alivio { background: var(--salvia); box-shadow: none; }
+  .tarjeta.calida { background: var(--terracota); box-shadow: none; }
 
   /* Tarjetas de inicio: cuadro de color con el ícono + título + descripción */
   .tarjeta-boton {
@@ -122,8 +122,9 @@
   }
   /* Colores del manual: herramientas en salvia, presupuesto en miel, conversar en arena, fondo en terracota */
   .tarjeta-boton[onclick*="'dinero'"] .emoji { background: var(--miel); }
-  .tarjeta-boton[onclick*="'chat'"] .emoji,
   .tarjeta-boton[onclick*="'aprende'"] .emoji { background: var(--arena); }
+  .tarjeta-boton[onclick*="'tarjeta'"] .emoji,
+  .tarjeta-boton[onclick*="'chat'"] .emoji,
   .tarjeta-boton[onclick*="'fondo'"] .emoji { background: var(--terracota); }
   .tarjeta-boton strong { font-size: 1rem; font-weight: 500; color: var(--tinta); align-self: end; }
   .tarjeta-boton span.desc { display: block; color: var(--texto-suave); font-size: 0.875rem; line-height: 1.25rem; margin-top: 1px; align-self: start; }
@@ -488,7 +489,7 @@
     white-space: pre-wrap;
     word-wrap: break-word;
   }
-  .burbuja.bot { background: var(--arena); color: var(--tinta); border-bottom-left-radius: 4px; align-self: flex-start; }
+  .burbuja.bot { background: var(--terracota); color: var(--tinta); border-bottom-left-radius: 4px; align-self: flex-start; }
   .burbuja.usuario { background: var(--pino); color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
   .burbuja.escribiendo { color: var(--texto-suave); font-style: italic; }
   .burbuja .quien { display: block; font-size: 0.875rem; font-weight: 500; color: var(--pino); margin-bottom: 2px; }
@@ -961,7 +962,7 @@
     <h2>🤝 Fondo Solidario Berit</h2>
     <p class="intro">¿La deuda no te deja respirar? Estamos aquí para ayudarte.</p>
 
-    <div class="tarjeta">
+    <div class="tarjeta calida">
       <h3 style="margin-top:0">Te damos un respiro</h3>
       <p style="font-size:0.95rem">Si una deuda cara te está asfixiando, la <strong>Fundación Berit</strong> quiere ayudarte: te prestamos con interés bajo para que salgas de esa deuda y la cambies por una cuota justa que sí puedas pagar. Eso es este fondo: un respiro para volver a empezar.</p>
       <p style="font-size:0.95rem; margin-top:0.5rem">"Berit" es una palabra hebrea que significa <strong>pacto</strong>: un acuerdo que se sostiene en la palabra y la confianza. Así funciona esta ayuda, de persona a persona. No es un negocio: lo que devuelves sirve para darle un respiro a la siguiente persona.</p>
