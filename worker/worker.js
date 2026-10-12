@@ -11,6 +11,7 @@
 // Cloudflare autocompleta los cierres de /* */ y daña el pegado/tecleo.
 
 const ORIGENES_PERMITIDOS = [
+  "https://librededeudas.beritfundacion.org",
   "https://carla-scribano.github.io",
   "http://localhost:8642",
 ];
