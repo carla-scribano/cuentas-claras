@@ -1,6 +1,8 @@
 # 💡 Libre de Deudas
 
-> Antes se llamaba "Cuentas Claras"; se renombró en octubre 2026 porque ya existe una app Android con ese nombre. La URL pública se mantiene por ahora.
+**En vivo:** https://librededeudas.beritfundacion.org/ — un proyecto de la Fundación Berit.
+
+> Antes se llamaba "Cuentas Claras"; se renombró en octubre 2026 porque ya existe una app Android con ese nombre.
 
 Herramientas gratuitas de educación financiera para Ecuador y Latinoamérica. Proyecto social, sin fines de lucro.
 

@@ -1,8 +1,11 @@
 # Libre de Deudas — contexto para sesiones de Claude
 
 Proyecto social pro bono de educación financiera para Ecuador/Latam, de Carla.
-Publicado en: https://carla-scribano.github.io/cuentas-claras/ (GitHub Pages, repo carla-scribano/cuentas-claras).
-Renombrado de "Cuentas Claras" a "Libre de Deudas" en octubre 2026 (ya existía una app Android con el nombre anterior). Solo cambió el nombre visible: la URL, el repo y las claves de localStorage se mantienen; la URL definitiva se decidirá junto con el dominio propio.
+Publicado en: https://librededeudas.beritfundacion.org/ (GitHub Pages con dominio propio, repo carla-scribano/cuentas-claras). Es la dirección definitiva: no volver a cambiarla, porque los datos de los usuarios en localStorage dependen de ella.
+- Dominio: `beritfundacion.org` es de la Fundación Berit de Carla; su DNS se administra en Squarespace (allí está el registro CNAME `librededeudas` → `carla-scribano.github.io`). La raíz `beritfundacion.org` es una página de Squarespace aparte; no tocarla.
+- La dirección vieja `carla-scribano.github.io/cuentas-claras/` redirige sola a la nueva. El worker acepta ambas en `ORIGENES_PERMITIDOS`.
+- Si algún día se cambia de hosting (p. ej. Netlify), basta con cambiar el destino del CNAME en Squarespace; la dirección no cambia.
+Renombrado de "Cuentas Claras" a "Libre de Deudas" en octubre 2026 (ya existía una app Android con el nombre anterior). El repo y las claves de localStorage conservan el nombre viejo a propósito.
 
 ## Arquitectura
 
@@ -43,5 +46,5 @@ Plan completo en `~/.claude/plans/okay-te-puse-en-delegated-stream.md`. Orden: (
 ## Pendientes conocidos
 
 - Enlace de donaciones: la tarjeta "¿Te sirvió?" en Inicio tiene `ENLACES_DONACION = []` en index.html esperando un PayPal.Me o enlace deUna de Carla (pospuesto hasta que lo cree).
-- Pospuestos por decisión de Carla: dominio propio (junto con la URL definitiva del nuevo nombre) y difusión (cuando PWA y fondo estén en vivo).
+- Hecho: dominio propio (librededeudas.beritfundacion.org, octubre 2026). Siguiente: difusión (PWA y fondo ya están en vivo).
 - Ideas futuras en README.md (audio para WhatsApp, kichwa, validar tasas BCE).
