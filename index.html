@@ -1992,7 +1992,7 @@ async function enviarSolicitudFondo() {
 }
 
 /* ===== Modo app (PWA): permite instalar la página y usarla sin internet ===== */
-if ("serviceWorker" in navigator) {
+if ("serviceWorker" in navigator && !window.__esApp) { // en la app de las tiendas la página ya viene incluida
   navigator.serviceWorker.register("sw.js").catch(() => {});
 }
 
