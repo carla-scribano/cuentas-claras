@@ -435,6 +435,22 @@
   .modal p, .modal li { font-size: 1rem; margin: 0.5rem 0; }
   .modal ul { margin: 0.5rem 0 0.5rem 1.1rem; }
   .presets { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 0.6rem 0; }
+  .metodos { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.7rem 0 0; }
+  .metodos button {
+    font: inherit; font-size: 0.875rem; text-align: left; cursor: pointer;
+    background: white; color: var(--texto-suave);
+    border: 1.5px solid var(--borde); border-radius: 12px;
+    padding: 0.7rem 0.85rem; min-height: 56px;
+  }
+  .metodos button strong { display: block; font-size: 1rem; font-weight: 500; color: var(--pino); margin-bottom: 1px; }
+  .metodos button.activo { border-color: var(--pino); background: var(--salvia); color: var(--tinta); }
+  .comparacion { font-size: 0.875rem; }
+  .comparacion th, .comparacion td { padding: 0.5rem 0.3rem; }
+  .comparacion td.num, .comparacion th.num { text-align: right; }
+  .comparacion td:first-child { font-weight: 500; }
+  .comparacion tr.elegido td { background: var(--salvia); font-weight: 500; }
+  .nota-ecuador { background: var(--miel); border-radius: 14px; padding: 0.8rem 0.95rem; margin: 0.8rem 0; font-size: 0.9375rem; }
+  .ayuda-abono { background: var(--crema); box-shadow: none; border: 1px solid var(--borde); margin: 0.6rem 0; }
   .presets button {
     font: inherit;
     font-size: 0.875rem;
@@ -682,17 +698,17 @@
       <label for="c-precio">¿Cuánto cuesta pagando de contado?
         <small>El precio normal, si lo pagaras todo de una. Pregúntalo en la tienda o búscalo en internet.</small>
       </label>
-      <input type="number" id="c-precio" inputmode="decimal" placeholder="Ej: 250" min="0">
+      <input type="text" id="c-precio" inputmode="decimal" autocomplete="off" placeholder="Ej: 250" min="0">
 
       <label for="c-entrada">¿Cuánto das de entrada?
         <small>Si no te piden entrada, deja 0.</small>
       </label>
-      <input type="number" id="c-entrada" inputmode="decimal" placeholder="0" min="0">
+      <input type="text" id="c-entrada" inputmode="decimal" autocomplete="off" placeholder="0" min="0">
 
       <div class="fila">
         <div>
           <label for="c-cuota">¿De cuánto es cada cuota?</label>
-          <input type="number" id="c-cuota" inputmode="decimal" placeholder="Ej: 12">
+          <input type="text" id="c-cuota" inputmode="decimal" autocomplete="off" placeholder="Ej: 12">
         </div>
         <div>
           <label for="c-numcuotas">¿Cuántas cuotas son?</label>
@@ -720,17 +736,17 @@
 
     <div class="tarjeta">
       <label for="t-saldo">¿Cuánto debes en la tarjeta?</label>
-      <input type="number" id="t-saldo" inputmode="decimal" placeholder="Ej: 1500" min="0">
+      <input type="text" id="t-saldo" inputmode="decimal" autocomplete="off" placeholder="Ej: 1500" min="0">
 
       <label for="t-tasa">Interés anual de tu tarjeta (%)
         <small>Sale en tu estado de cuenta. En Ecuador suele estar cerca del 16%. Si no sabes, deja 16.</small>
       </label>
-      <input type="number" id="t-tasa" inputmode="decimal" value="16" min="0" max="200">
+      <input type="text" id="t-tasa" inputmode="decimal" autocomplete="off" value="16" min="0" max="200">
 
       <label for="t-pago">¿Cuánto pagas cada mes?
         <small>Lo que de verdad abonas mensualmente.</small>
       </label>
-      <input type="number" id="t-pago" inputmode="decimal" placeholder="Ej: 50" min="0">
+      <input type="text" id="t-pago" inputmode="decimal" autocomplete="off" placeholder="Ej: 50" min="0">
 
       <button class="principal" onclick="calcularTarjeta()">Ver cuándo salgo de esta deuda</button>
     </div>
@@ -741,7 +757,7 @@
   <!-- ============ PLAN BOLA DE NIEVE ============ -->
   <section id="pantalla-plan" class="pantalla">
     <h2>🧗 Tu plan para salir de deudas</h2>
-    <p class="intro">El método <strong>bola de nieve</strong>: pagas el mínimo de todas tus deudas, y todo lo extra lo mandas a la más pequeña. Cuando esa muere, su cuota se suma a la siguiente. Cada deuda pagada te da fuerza para la próxima.</p>
+    <p class="intro">Anota tus deudas, cuéntanos cuánto ganas y elige un método. Te decimos en qué orden pagarlas, cuánto pagarás de intereses y cuándo quedas libre.</p>
 
     <div class="tarjeta">
       <h3>1. Anota todas tus deudas</h3>
@@ -758,22 +774,22 @@
         <div class="fila">
           <div>
             <label for="d-saldo">¿Cuánto debes?</label>
-            <input type="number" id="d-saldo" inputmode="decimal" placeholder="Ej: 400" min="0">
+            <input type="text" id="d-saldo" inputmode="decimal" autocomplete="off" placeholder="Ej: 400" min="0">
           </div>
           <div>
             <label for="d-cuota">Cuota mensual mínima</label>
-            <input type="number" id="d-cuota" inputmode="decimal" placeholder="Ej: 25" min="0">
+            <input type="text" id="d-cuota" inputmode="decimal" autocomplete="off" placeholder="Ej: 25" min="0">
           </div>
         </div>
         <label for="d-tasa">Interés anual (%) <small>Si no sabes, deja 16. Si es sin interés (ej: le debes a un familiar), pon 0.</small></label>
-        <input type="number" id="d-tasa" inputmode="decimal" value="16" min="0" max="500">
+        <input type="text" id="d-tasa" inputmode="decimal" autocomplete="off" value="16" min="0" max="500">
       </div>
 
       <div id="campos-fija" style="display:none">
         <div class="fila">
           <div>
             <label for="df-cuota">¿De cuánto es la cuota?</label>
-            <input type="number" id="df-cuota" inputmode="decimal" placeholder="Ej: 50" min="0">
+            <input type="text" id="df-cuota" inputmode="decimal" autocomplete="off" placeholder="Ej: 50" min="0">
           </div>
           <div>
             <label for="df-ncuotas">¿Cuántas cuotas te faltan?</label>
@@ -781,8 +797,14 @@
           </div>
         </div>
         <label for="df-tasa">Interés anual (%) <small>Sale en tu tabla de pagos. Si no sabes, deja 16; si te prestaron sin interés, pon 0.</small></label>
-        <input type="number" id="df-tasa" inputmode="decimal" value="16" min="0" max="500">
+        <input type="text" id="df-tasa" inputmode="decimal" autocomplete="off" value="16" min="0" max="500">
+        <label for="df-capital">¿Cuánto te falta de capital? <small>Opcional. Sale en tu estado de cuenta o tabla de pagos como "saldo de capital". Si no lo sabes, lo calculamos con la cuota y el interés.</small></label>
+        <input type="text" id="df-capital" inputmode="decimal" autocomplete="off" placeholder="Ej: 800">
       </div>
+
+      <label for="d-dia">¿Qué día del mes pagas? <small>Opcional, del 1 al 31.</small></label>
+      <input type="text" id="d-dia" inputmode="numeric" autocomplete="off" maxlength="2" placeholder="Ej: 15">
+      <p id="d-aviso-app" style="display:none; font-size:0.875rem; color:var(--texto-suave); margin-top:0.4rem">🔔 Con el día de pago, la app te avisa un día antes para que no se te pase.</p>
 
       <button class="secundario" onclick="agregarDeuda()">+ Agregar esta deuda</button>
 
@@ -790,11 +812,28 @@
     </div>
 
     <div class="tarjeta">
-      <h3>2. ¿Cuánto extra puedes poner al mes?</h3>
-      <label for="d-extra">Aunque sean $5, todo suma
-        <small>Plata adicional a los pagos mínimos que ya haces.</small>
+      <h3>2. Tu ingreso y tu extra</h3>
+      <label for="d-ingreso">¿Cuánto te ingresa al mes?
+        <small>Si tu ingreso varía, pon el de un mes malo. Es el mismo dato de tu presupuesto.</small>
       </label>
-      <input type="number" id="d-extra" inputmode="decimal" placeholder="Ej: 20" min="0">
+      <input type="text" id="d-ingreso" inputmode="decimal" autocomplete="off" placeholder="Ej: 460" oninput="cambiarIngresoPlan()">
+      <div id="d-medidor"></div>
+
+      <label for="d-extra">¿Cuánto extra puedes poner al mes?
+        <small>Plata adicional a las cuotas que ya pagas. Aunque sean $5, todo suma.</small>
+      </label>
+      <input type="text" id="d-extra" inputmode="decimal" autocomplete="off" placeholder="Ej: 20" min="0">
+      <div id="d-sugerencia"></div>
+    </div>
+
+    <div class="tarjeta">
+      <h3>3. Elige tu método</h3>
+      <p style="font-size:0.9375rem; color:var(--texto-suave)">Los tres sacan de deudas. Cambia el orden en que pagas, y con eso cuánto tardas y cuánto pagas de intereses.</p>
+      <div class="metodos">
+        <button type="button" id="metodo-bola" class="activo" onclick="cambiarMetodo('bola')"><strong>⛄ Bola de nieve</strong>Primero la deuda más pequeña. Ves resultados rápido y eso motiva.</button>
+        <button type="button" id="metodo-avalancha" onclick="cambiarMetodo('avalancha')"><strong>🏔️ Avalancha</strong>Primero la de interés más alto. Es la que menos intereses te cobra en total.</button>
+        <button type="button" id="metodo-alivio" onclick="cambiarMetodo('alivio')"><strong>🌬️ Alivio rápido</strong>Primero la que liberas antes con su propia cuota. Te deja más plata libre cada mes, más pronto.</button>
+      </div>
       <button class="principal" onclick="calcularPlan()">Armar mi plan</button>
     </div>
 
@@ -811,7 +850,7 @@
       <label for="p-ingreso">¿Cuánto te ingresa al mes?
         <small>Si tu ingreso varía, pon el de un mes malo: lo del mes bueno va al ahorro.</small>
       </label>
-      <input type="number" id="p-ingreso" inputmode="decimal" placeholder="Ej: 460" min="0" oninput="cambiarIngreso()">
+      <input type="text" id="p-ingreso" inputmode="decimal" autocomplete="off" placeholder="Ej: 460" min="0" oninput="cambiarIngreso()">
 
       <div class="fila-opcional">
         <input type="checkbox" id="p-diezmo-check" onchange="alternarDiezmo()">
@@ -1100,6 +1139,16 @@
 </nav>
 
 <script>
+/* ================= Montos: aceptar coma o punto decimal ================= */
+// El teclado del celular en Ecuador escribe "12,50". Los campos de montos son de
+// texto y aquí se deja solo un número con punto, antes de que corra cualquier cálculo.
+document.addEventListener("input", (e) => {
+  const campo = e.target;
+  if (!campo.matches || !campo.matches('input[inputmode="decimal"]')) return;
+  const limpio = campo.value.replace(/,/g, ".").replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1");
+  if (limpio !== campo.value) campo.value = limpio;
+}, true);
+
 /* ================= Navegación ================= */
 function irA(nombre) {
   document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
@@ -1108,6 +1157,7 @@ function irA(nombre) {
   const botonNav = document.getElementById('nav-' + nombre); // hay pantallas sin pestaña (ej: fondo)
   if (botonNav) botonNav.classList.add('activo');
   if (nombre === 'fondo') actualizarFondo();
+  if (nombre === 'plan') pintarMedidor();
   window.scrollTo({ top: 0 });
 }
 
@@ -1359,10 +1409,21 @@ function cargarDeudas() {
     if (guardadas) deudas = JSON.parse(guardadas);
   } catch (e) { deudas = []; }
   pintarDeudas();
+  if (window.__esApp) document.getElementById('d-aviso-app').style.display = '';
+  avisarRecordatoriosApp();
 }
 
 function guardarDeudas() {
   try { localStorage.setItem('cuentasClarasDeudas', JSON.stringify(deudas)); } catch (e) {}
+  avisarRecordatoriosApp();
+}
+
+// Dentro de la app de las tiendas, el teléfono programa un aviso mensual por
+// cada deuda con día de pago. En la web no hace nada.
+function avisarRecordatoriosApp() {
+  if (!window.__esApp || !window.ReactNativeWebView) return;
+  const conDia = deudas.filter((d) => d.diaPago).map((d) => ({ nombre: d.nombre, cuota: d.cuota, diaPago: d.diaPago }));
+  window.ReactNativeWebView.postMessage(JSON.stringify({ tipo: 'recordatorios', deudas: conDia }));
 }
 
 let tipoDeudaActual = "rotativa";
@@ -1375,29 +1436,50 @@ function cambiarTipoDeuda(tipo) {
   document.getElementById("campos-fija").style.display = tipo === "fija" ? "" : "none";
 }
 
+function leerDiaPago() {
+  const texto = document.getElementById('d-dia').value.trim();
+  if (!texto) return null;
+  const dia = parseInt(texto);
+  if (!(dia >= 1 && dia <= 31)) return undefined;
+  return dia;
+}
+
 function agregarDeuda() {
   const nombre = document.getElementById('d-nombre').value.trim();
   if (!nombre) {
     alert('Ponle un nombre a la deuda (¿a quién le debes?).');
     return;
   }
+  const diaPago = leerDiaPago();
+  if (diaPago === undefined) {
+    alert('El día de pago tiene que ser un número del 1 al 31, o déjalo vacío.');
+    return;
+  }
 
+  let deuda;
   if (tipoDeudaActual === 'fija') {
-    // Préstamo a cuotas fijas (mutuo): el capital pendiente se calcula
-    // a partir de la cuota, las cuotas que faltan y la tasa (valor presente).
     const cuota = parseFloat(document.getElementById('df-cuota').value);
     const n = parseInt(document.getElementById('df-ncuotas').value);
     const tasa = parseFloat(document.getElementById('df-tasa').value) || 0;
+    const capital = parseFloat(document.getElementById('df-capital').value);
     if (!cuota || cuota <= 0 || !n || n <= 0) {
       alert('Necesito el valor de la cuota y cuántas cuotas te faltan.');
       return;
     }
-    const i = Math.pow(1 + tasa / 100, 1 / 12) - 1;
-    const saldo = i > 0 ? (cuota * (1 - Math.pow(1 + i, -n))) / i : cuota * n;
-    deudas.push({ nombre, saldo: Math.round(saldo * 100) / 100, cuota, tasa, tipo: 'fija', cuotasPlan: n });
+    let saldo;
+    if (capital > 0) {
+      saldo = capital;
+    } else {
+      // Sin el dato del estado de cuenta, el capital pendiente se estima
+      // con la cuota, las cuotas que faltan y la tasa (valor presente).
+      const i = Math.pow(1 + tasa / 100, 1 / 12) - 1;
+      saldo = i > 0 ? (cuota * (1 - Math.pow(1 + i, -n))) / i : cuota * n;
+    }
+    deuda = { nombre, saldo: Math.round(saldo * 100) / 100, cuota, tasa, tipo: 'fija', cuotasPlan: n, capitalDado: capital > 0 };
     document.getElementById('df-cuota').value = '';
     document.getElementById('df-ncuotas').value = '';
     document.getElementById('df-tasa').value = '16';
+    document.getElementById('df-capital').value = '';
   } else {
     const saldo = parseFloat(document.getElementById('d-saldo').value);
     const cuota = parseFloat(document.getElementById('d-cuota').value);
@@ -1406,21 +1488,26 @@ function agregarDeuda() {
       alert('Necesito cuánto debes y la cuota mensual.');
       return;
     }
-    deudas.push({ nombre, saldo, cuota, tasa, tipo: 'rotativa' });
+    deuda = { nombre, saldo, cuota, tasa, tipo: 'rotativa' };
     document.getElementById('d-saldo').value = '';
     document.getElementById('d-cuota').value = '';
     document.getElementById('d-tasa').value = '16';
   }
+  if (diaPago) deuda.diaPago = diaPago;
+  deudas.push(deuda);
 
   guardarDeudas();
   pintarDeudas();
+  pintarMedidor();
   document.getElementById('d-nombre').value = '';
+  document.getElementById('d-dia').value = '';
 }
 
 function borrarDeuda(indice) {
   deudas.splice(indice, 1);
   guardarDeudas();
   pintarDeudas();
+  pintarMedidor();
   document.getElementById('d-resultado').classList.remove('visible');
 }
 
@@ -1435,18 +1522,114 @@ function pintarDeudas() {
       <div class="info">
         <div class="nombre">${escaparHtml(d.nombre)}</div>
         <div class="detalle">${d.tipo === "fija"
-          ? `Te faltan ${d.cuotasPlan} cuotas de ${dinero(d.cuota)} · ${d.tasa}% anual (≈ ${dinero(d.saldo)} de capital)`
-          : `Debes ${dinero(d.saldo)} · cuota ${dinero(d.cuota)}/mes · ${d.tasa}% anual`}</div>
+          ? `Te faltan ${d.cuotasPlan} cuotas de ${dinero(d.cuota)} · ${tasaTexto(d.tasa)}% anual (${d.capitalDado ? 'capital pendiente' : '≈'} ${dinero(d.saldo)}${d.capitalDado ? '' : ' de capital'})`
+          : `Debes ${dinero(d.saldo)} · cuota ${dinero(d.cuota)}/mes · ${tasaTexto(d.tasa)}% anual`}${d.diaPago ? ` · pagas el día ${d.diaPago}` : ''}</div>
       </div>
       <button onclick="borrarDeuda(${idx})" aria-label="Borrar deuda">✕</button>
     </div>
   `).join('');
 }
 
+function tasaTexto(tasa) {
+  return String(tasa).replace('.', ',');
+}
+
 function escaparHtml(texto) {
   const div = document.createElement('div');
   div.textContent = texto;
   return div.innerHTML;
+}
+
+/* ---------- Paso 2: ingreso, medidor y sugerencia de extra ---------- */
+function cambiarIngresoPlan() {
+  const v = parseFloat(document.getElementById('d-ingreso').value);
+  // Es el mismo dato del presupuesto: se guarda una sola vez
+  document.getElementById('p-ingreso').value = v > 0 ? v : '';
+  cambiarIngreso();
+  pintarMedidor();
+}
+
+function pintarMedidor() {
+  const medidor = document.getElementById('d-medidor');
+  const sugerencia = document.getElementById('d-sugerencia');
+  const campo = document.getElementById('d-ingreso');
+  const ingreso = presupuesto.ingreso;
+  if (document.activeElement !== campo) campo.value = ingreso || '';
+  const cuotas = cuotasDelPlan();
+  if (!ingreso || deudas.length === 0) {
+    medidor.innerHTML = '';
+    sugerencia.innerHTML = '';
+    return;
+  }
+  const parte = cuotas / ingreso;
+  const nivel = parte > 0.5
+    ? { clase: 'rojo', palabra: 'Peligro', texto: 'Es más de la mitad de lo que ganas. Conviene pedir a tus acreedores refinanciar o bajar las cuotas.' }
+    : parte > 1 / 3
+      ? { clase: 'amarillo', palabra: 'Cuidado', texto: 'Es más de un tercio de lo que ganas. Evita deudas nuevas mientras sales de estas.' }
+      : { clase: 'verde', palabra: 'Bien', texto: 'Es un nivel que puedes manejar.' };
+  medidor.innerHTML = `<div class="veredicto ${nivel.clase}"><span class="titulo">${nivel.palabra}</span>Tus cuotas suman ${dinero(cuotas)} de los ${dinero(ingreso)} que ganas al mes (${Math.round(parte * 100)}%). ${nivel.texto}</div>`;
+
+  const apartado = ingreso * (presupuesto.pct.deudas || 0) / 100;
+  const libre = Math.floor(apartado - cuotas);
+  if (libre >= 1) {
+    sugerencia.innerHTML = `<p style="font-size:0.9375rem; margin-top:0.6rem">Tu presupuesto aparta ${presupuesto.pct.deudas}% para deudas (${dinero(apartado)}). Después de tus cuotas te quedan <strong>${dinero(libre)}</strong> para poner de extra.</p>
+      <button class="secundario" onclick="document.getElementById('d-extra').value = ${libre}">Usar ${dinero(libre)} como extra</button>`;
+  } else {
+    sugerencia.innerHTML = `<p style="font-size:0.9375rem; margin-top:0.6rem; color:var(--texto-suave)">Tu presupuesto no deja plata extra para deudas después de las cuotas. Revisa tu reparto en Plata 💰, o pon aquí lo que puedas, aunque sean $5.</p>`;
+  }
+}
+
+/* ---------- Paso 3: métodos ---------- */
+const METODOS = {
+  bola: { nombre: '⛄ Bola de nieve', orden: (a, b) => a.saldo - b.saldo,
+    explicacion: 'Paga el mínimo de todas, y TODO lo extra a la #1, que es la más pequeña. Cuando la liquides, su cuota pasa a la #2, y así la bola crece.' },
+  avalancha: { nombre: '🏔️ Avalancha', orden: (a, b) => (b.tasa - a.tasa) || (a.saldo - b.saldo),
+    explicacion: 'Paga el mínimo de todas, y TODO lo extra a la #1, que es la de interés más alto. Cuando la liquides, su cuota pasa a la #2. Así pagas menos intereses en total.' },
+  alivio: { nombre: '🌬️ Alivio rápido', orden: (a, b) => (a.saldo / a.cuota) - (b.saldo / b.cuota),
+    explicacion: 'Paga el mínimo de todas, y TODO lo extra a la #1, la que te faltan menos meses para liquidar con su propia cuota. Cada deuda que cierras libera su cuota pronto, y eso te da aire cada mes.' },
+};
+let metodoActual = 'bola';
+
+function cambiarMetodo(metodo) {
+  metodoActual = metodo;
+  Object.keys(METODOS).forEach((m) => document.getElementById('metodo-' + m).classList.toggle('activo', m === metodo));
+  if (document.getElementById('d-resultado').classList.contains('visible')) calcularPlan();
+}
+
+// Simulación mes a mes: cuotas en todas las deudas + (extra + cuotas ya liberadas)
+// a la primera deuda viva según el orden del método.
+function simularPlan(extra, ordenar) {
+  const sim = deudas.map((d) => ({ ...d, restante: d.saldo, mesLiquidada: null, interesPagado: 0 })).sort(ordenar);
+  let mes = 0;
+  let imposible = false;
+  while (sim.some((d) => d.restante > 0) && mes < 1200) {
+    mes++;
+    let bolsaExtra = extra;
+    sim.forEach((d) => { if (d.restante <= 0) bolsaExtra += d.cuota; });
+    let avanzo = false;
+    for (const d of sim) {
+      if (d.restante <= 0) continue;
+      const interes = d.restante * (Math.pow(1 + d.tasa / 100, 1 / 12) - 1);
+      d.interesPagado += interes;
+      d.restante = d.restante + interes - d.cuota;
+      if (d.restante < d.saldo) avanzo = true;
+      if (d.restante <= 0) { d.mesLiquidada = mes; d.restante = 0; }
+    }
+    const objetivo = sim.find((d) => d.restante > 0);
+    if (objetivo && bolsaExtra > 0) {
+      objetivo.restante -= bolsaExtra;
+      avanzo = true;
+      if (objetivo.restante <= 0) { objetivo.mesLiquidada = mes; objetivo.restante = 0; }
+    }
+    if (!avanzo && mes > 2) { imposible = true; break; }
+  }
+  return {
+    sim,
+    meses: mes,
+    imposible: imposible || mes >= 1200,
+    intereses: sim.reduce((s, d) => s + d.interesPagado, 0),
+    primera: Math.min(...sim.map((d) => d.mesLiquidada || Infinity)),
+  };
 }
 
 function calcularPlan() {
@@ -1459,45 +1642,12 @@ function calcularPlan() {
     return;
   }
 
-  // Bola de nieve: ordenar de menor a mayor saldo
-  const orden = deudas.map((d, idx) => ({ ...d, idx })).sort((a, b) => a.saldo - b.saldo);
+  const resultados = {};
+  Object.keys(METODOS).forEach((m) => { resultados[m] = simularPlan(extra, METODOS[m].orden); });
+  const r = resultados[metodoActual];
+  const metodo = METODOS[metodoActual];
 
-  // Simulación mes a mes: mínimos en todas + (extra + cuotas liberadas) a la más pequeña viva
-  const sim = orden.map(d => ({ ...d, restante: d.saldo, mesLiquidada: null, interesPagado: 0 }));
-  let mes = 0;
-  const maxMeses = 1200;
-  let imposible = false;
-
-  while (sim.some(d => d.restante > 0) && mes < maxMeses) {
-    mes++;
-    let bolsaExtra = extra;
-    // Cuotas de deudas ya pagadas se suman a la bolsa (el efecto bola de nieve)
-    sim.forEach(d => { if (d.restante <= 0) bolsaExtra += d.cuota; });
-
-    let avanzo = false;
-    for (const d of sim) {
-      if (d.restante <= 0) continue;
-      const interes = d.restante * (Math.pow(1 + d.tasa / 100, 1 / 12) - 1);
-      d.interesPagado += interes;
-      let pago = d.cuota;
-      d.restante = d.restante + interes - pago;
-      if (d.restante < d.saldo) avanzo = true;
-      if (d.restante <= 0) { d.mesLiquidada = mes; d.restante = 0; }
-    }
-    // El extra va a la deuda viva más pequeña (la primera en el orden)
-    const objetivo = sim.find(d => d.restante > 0);
-    if (objetivo && bolsaExtra > 0) {
-      objetivo.restante -= bolsaExtra;
-      avanzo = true;
-      if (objetivo.restante <= 0) { objetivo.mesLiquidada = mes; objetivo.restante = 0; }
-    }
-    if (!avanzo && mes > 2) { imposible = true; break; }
-  }
-
-  const totalDeuda = deudas.reduce((s, d) => s + d.saldo, 0);
-  const totalCuotas = deudas.reduce((s, d) => s + d.cuota, 0);
-
-  if (imposible || mes >= maxMeses) {
+  if (r.imposible) {
     caja.innerHTML = `
       <div class="veredicto rojo">
         <span class="titulo">Con estos pagos, las deudas no bajan</span>
@@ -1507,31 +1657,52 @@ function calcularPlan() {
     return;
   }
 
-  const tiempoTexto = textoTiempo(mes);
-
+  const totalDeuda = deudas.reduce((s, d) => s + d.saldo, 0);
+  const totalCuotas = cuotasDelPlan();
   const fechaLibre = new Date();
-  fechaLibre.setMonth(fechaLibre.getMonth() + mes);
+  fechaLibre.setMonth(fechaLibre.getMonth() + r.meses);
   const nombreMeses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const fechaTexto = nombreMeses[fechaLibre.getMonth()] + ' de ' + fechaLibre.getFullYear();
 
+  const filas = Object.keys(METODOS).map((m) => {
+    const x = resultados[m];
+    return `<tr class="${m === metodoActual ? 'elegido' : ''}">
+      <td>${METODOS[m].nombre.replace(/^\S+\s/, '')}</td>
+      <td class="num">${x.imposible ? '—' : textoTiempo(x.meses)}</td>
+      <td class="num">${x.imposible ? '—' : dinero(x.intereses)}</td>
+      <td class="num">${x.imposible ? '—' : 'mes ' + x.primera}</td>
+    </tr>`;
+  }).join('');
+
+  const opcionesAbono = deudas.map((d, i) => `<option value="${i}">${escaparHtml(d.nombre)} (${dinero(d.saldo)})</option>`).join('');
+
   caja.innerHTML = `
     <div class="veredicto verde">
-      <span class="titulo">¡Tienes plan! Serías libre de deudas en ${tiempoTexto}</span>
-      Pagando tus cuotas (${dinero(totalCuotas)}/mes) más ${dinero(extra)} extra, terminarías cerca de <strong>${fechaTexto}</strong>.
+      <span class="titulo">¡Tienes plan! Serías libre de deudas en ${textoTiempo(r.meses)}</span>
+      Pagando tus cuotas (${dinero(totalCuotas)}/mes) más ${dinero(extra)} extra, con el método ${metodo.nombre.replace(/^\S+\s/, '')}, terminarías cerca de <strong>${fechaTexto}</strong> y pagarías ${dinero(r.intereses)} de intereses.
     </div>
 
     <div class="tarjeta">
       <h3>Tu orden de ataque</h3>
-      <p style="font-size:0.9rem; color:var(--texto-suave)">Paga el mínimo de todas, y TODO lo extra a la #1. Cuando la #1 muera, su cuota pasa a la #2, y así la bola crece.</p>
-      ${sim.map((d, posicion) => `
+      <p style="font-size:0.9375rem; color:var(--texto-suave)">${metodo.explicacion}</p>
+      ${r.sim.map((d, posicion) => `
         <div class="deuda-item">
           <span class="orden-numero">${posicion + 1}</span>
           <div class="info">
             <div class="nombre">${escaparHtml(d.nombre)}</div>
-            <div class="detalle">${dinero(d.saldo)} · la liquidas en el mes ${d.mesLiquidada}</div>
+            <div class="detalle">${dinero(d.saldo)} · ${tasaTexto(d.tasa)}% anual · la liquidas en el mes ${d.mesLiquidada}${d.diaPago ? ` · pagas el día ${d.diaPago}` : ''}</div>
           </div>
         </div>
       `).join('')}
+    </div>
+
+    <div class="tarjeta">
+      <h3>Compara los tres métodos</h3>
+      <p style="font-size:0.9375rem; color:var(--texto-suave)">Con tus mismas deudas y ${dinero(extra)} de extra al mes. Toca otro método arriba para ver su orden.</p>
+      <table class="comparacion">
+        <thead><tr><th>Método</th><th class="num">Terminas en</th><th class="num">Intereses</th><th class="num">1ª deuda pagada</th></tr></thead>
+        <tbody>${filas}</tbody>
+      </table>
     </div>
 
     <div class="tarjeta">
@@ -1541,15 +1712,72 @@ function calcularPlan() {
           <span class="etiqueta">deuda total hoy</span>
         </div>
         <div class="dato-grande">
-          <span class="numero">${mes}</span>
+          <span class="numero">${r.meses}</span>
           <span class="etiqueta">meses de plan</span>
         </div>
       </div>
       <p style="font-size:0.9rem; color:var(--texto-suave); margin-top:0.5rem">💪 Consejo: celebra cada deuda que liquides. No es solo plata: es paz. Y si un mes no puedes con el extra, no abandones el plan; paga los mínimos y retoma el siguiente mes.</p>
     </div>
+
+    <div class="tarjeta">
+      <h3>💡 ¿Y si abonas a capital?</h3>
+      <p style="font-size:0.9375rem">Si te llega una plata extra (décimo, utilidades, una venta), mira cuánto te ahorras si la usas para bajar una deuda.</p>
+      <details class="ayuda-abono">
+        <summary>¿Qué significa abonar a capital?</summary>
+        <div class="contenido">
+          <p>Lo que debes tiene dos partes: el <strong>capital</strong> (la plata que te prestaron) y los <strong>intereses</strong> (lo que te cobran cada mes por esa plata). Los intereses se calculan sobre el capital que todavía debes.</p>
+          <p>Abonar a capital es pagar un valor extra que va directo a bajar el capital. Como queda menos capital, cada mes te cobran menos interés, y ese ahorro se repite todos los meses que faltan.</p>
+          <p>El banco puede usar tu abono para <strong>bajar el número de cuotas</strong> (terminas antes y ahorras más interés) o para <strong>bajar el valor de la cuota</strong> (te alivia el mes). Este cálculo muestra la primera opción.</p>
+        </div>
+      </details>
+      <div class="nota-ecuador"><strong>Ojo, en Ecuador:</strong> antes de abonar, comunícate con tu banco o acreedor y pide que ese pago vaya <strong>a capital</strong>. Si solo depositas de más, muchas veces lo toman como adelanto de las próximas cuotas y no baja tu interés. Pide tu nueva tabla de pagos por escrito.</div>
+      <label for="a-deuda">¿A qué deuda?</label>
+      <select id="a-deuda">${opcionesAbono}</select>
+      <label for="a-monto">¿Cuánto abonarías?</label>
+      <input type="text" id="a-monto" inputmode="decimal" autocomplete="off" placeholder="Ej: 200">
+      <button class="secundario" onclick="calcularAbono()">Calcular mi ahorro</button>
+      <div id="a-resultado"></div>
+    </div>
   `;
   caja.classList.add('visible');
   caja.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ---------- Abono a capital: cuánto interés te ahorras ---------- */
+function pagarDeudaSola(saldo, cuota, tasa) {
+  const i = Math.pow(1 + tasa / 100, 1 / 12) - 1;
+  let restante = saldo, meses = 0, interes = 0;
+  while (restante > 0.005 && meses < 1200) {
+    const delMes = restante * i;
+    if (cuota <= delMes) return null;
+    interes += delMes;
+    restante = restante + delMes - cuota;
+    meses++;
+  }
+  return meses >= 1200 ? null : { meses, interes };
+}
+
+function calcularAbono() {
+  const caja = document.getElementById('a-resultado');
+  const d = deudas[parseInt(document.getElementById('a-deuda').value)];
+  const monto = parseFloat(document.getElementById('a-monto').value);
+  if (!d || !(monto > 0)) {
+    caja.innerHTML = '<div class="veredicto amarillo"><span class="titulo">Falta el monto</span>Escribe cuánto abonarías.</div>';
+    return;
+  }
+  const sin = pagarDeudaSola(d.saldo, d.cuota, d.tasa);
+  if (!sin) {
+    caja.innerHTML = '<div class="veredicto rojo"><span class="titulo">Esta cuota no alcanza ni para los intereses</span>Con esa cuota la deuda no baja. Antes de abonar, habla con tu acreedor para refinanciar o subir la cuota.</div>';
+    return;
+  }
+  if (monto >= d.saldo) {
+    caja.innerHTML = `<div class="veredicto verde"><span class="titulo">Con ese abono la liquidas completa</span>Te ahorras unos ${dinero(sin.interes)} de intereses y ${textoTiempo(sin.meses)} de pagos. Pide a tu acreedor el valor exacto para liquidarla hoy, porque puede ser distinto a lo que anotaste.</div>`;
+    return;
+  }
+  const con = pagarDeudaSola(d.saldo - monto, d.cuota, d.tasa);
+  const ahorro = Math.max(0, sin.interes - con.interes);
+  const mesesMenos = sin.meses - con.meses;
+  caja.innerHTML = `<div class="veredicto verde"><span class="titulo">Te ahorras ${dinero(ahorro)} de intereses</span>Abonando ${dinero(monto)} a capital de ${escaparHtml(d.nombre)}, y pagando la misma cuota, terminas en ${textoTiempo(con.meses)} en vez de ${textoTiempo(sin.meses)}${mesesMenos > 0 ? ` (${textoTiempo(mesesMenos)} antes)` : ''}. Es un cálculo aproximado: tu banco te da el valor exacto.</div>`;
 }
 
 cargarDeudas();
